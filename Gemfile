@@ -4,7 +4,6 @@ source "https://rubygems.org"
 
 git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
-gem "capybara"
 gem "pry"
-gem "rake"
-gem "selenium-webdriver"
+gem "rake", "~> 10.0"
+gem "zenweb", "~> 3.10"
