@@ -41,8 +41,9 @@ namespace :sync do
       Rake::Task["sync:crosswords"].invoke("2014-05-18")
     end
 
-    file "projects/crosswords/crosswords.json" => FileList["var/crosswords/*.json"] do |t|
-      data = t.prerequisites
+    crossword_jsons = FileList["var/crosswords/*.json"]
+    file "projects/crosswords/crosswords.json" => crossword_jsons do |t|
+      data = crossword_jsons
         .map {|path| JSON.parse(File.read(path)) }
         .inject {|h, month_data| h.merge(month_data) }
         .map {|date, data|
