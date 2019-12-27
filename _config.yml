@@ -1,6 +1,7 @@
 exclude:
-  - Rakefile
+  - .gitignore
   - README.md
+  - Rakefile
   - babel.config.js
   - lib
   - node_modules
