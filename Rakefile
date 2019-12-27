@@ -23,7 +23,7 @@ task :run do
   require "webrick"
 
   Thread.new do
-    server = WEBrick::HTTPServer.new Port: 8000, DocumentRoot: ".site"
+    server = WEBrick::HTTPServer.new(Port: 8000, DocumentRoot: ".site")
     trap "INT" do
       server.shutdown
     end
@@ -36,7 +36,7 @@ task :run do
     Rerun::Runner.keep_running(cmd, options)
   end
 
-  system("open http://localhost:8000")
+  system "open http://localhost:8000"
 
   runner.join
 end
