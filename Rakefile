@@ -1,9 +1,14 @@
 require "date"
 require "logger"
 
+logger = Logger.new(STDOUT)
+logger.level = Logger::INFO
+
 require "pry"
 
 $LOAD_PATH.unshift(File.expand_path("lib", __dir__))
+module KejadlenDev; end
+include KejadlenDev
 
 namespace :zenweb do
   require "zenweb/tasks"
@@ -12,28 +17,31 @@ namespace :zenweb do
 end
 task default: "zenweb:generate"
 
-desc ""
+desc "Run and reload the generated site"
 task :run do
   require "rerun"
   require "webrick"
 
-  Thread.new {
+  Thread.new do
     server = WEBrick::HTTPServer.new Port: 8000, DocumentRoot: ".site"
     trap "INT" do
       server.shutdown
     end
     server.start
-  }
+  end
 
-  options = Rerun::Options.parse(args: %w[ --exit ])
-  Rerun::Runner.keep_running("rake zenweb:generate", options)
+  options = Rerun::Options.parse(args: %w[ rake zenweb:generate --exit ])
+  cmd = options.delete(:cmd)
+  runner = Thread.new do
+    Rerun::Runner.keep_running(cmd, options)
+  end
+
+  system("open http://localhost:8000")
+
+  runner.join
 end
 
 require "crosswords"
-
-include KejadlenDev
-logger = Logger.new(STDOUT)
-logger.level = Logger::INFO
 
 namespace :sync do
   desc "Sync crosswords"
