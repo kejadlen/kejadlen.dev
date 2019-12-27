@@ -10,6 +10,24 @@ namespace :zenweb do
 
   Zenweb::Site.text_files << "json"
 end
+task default: "zenweb:generate"
+
+desc ""
+task :run do
+  require "rerun"
+  require "webrick"
+
+  Thread.new {
+    server = WEBrick::HTTPServer.new Port: 8000, DocumentRoot: ".site"
+    trap "INT" do
+      server.shutdown
+    end
+    server.start
+  }
+
+  options = Rerun::Options.parse(args: %w[ --exit ])
+  Rerun::Runner.keep_running("rake zenweb:generate", options)
+end
 
 require "crosswords"
 
@@ -59,5 +77,3 @@ namespace :sync do
     end
   end
 end
-
-task default: "zenweb:generate"
