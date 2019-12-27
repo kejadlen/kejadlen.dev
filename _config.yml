@@ -1,8 +1,0 @@
-exclude:
-  - Rakefile
-  - README
-  - babel.config.js
-  - lib
-  - node_modules
-  - package.json
-  - var
