@@ -35,7 +35,7 @@ module KejadlenDev
       def fetch(date)
         id = puzzle_id(date)
         url = "#{API}/v6/game/#{id}.json"
-        JSON.parse(open(url, "nyt-s" => @nyt_s).read)
+        JSON.parse(URI.open(url, "nyt-s" => @nyt_s).read)
       end
 
       private
@@ -48,7 +48,7 @@ module KejadlenDev
         date_end = date_start >> 3 # 3 months
 
         url = "#{API}/v3/55348624/puzzles.json?date_start=#{date_start}&date_end=#{date_end}"
-        json = JSON.parse(open(url, "nyt-s" => @nyt_s).read)
+        json = JSON.parse(URI.open(url, "nyt-s" => @nyt_s).read)
         results = json.fetch("results")
 
         @puzzles.merge!(results.map {|result|
