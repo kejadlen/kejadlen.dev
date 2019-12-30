@@ -1,9 +1,0 @@
-exclude:
-  - .gitignore
-  - README.md
-  - Rakefile
-  - babel.config.js
-  - lib
-  - node_modules
-  - package.json
-  - var
