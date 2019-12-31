@@ -17,6 +17,13 @@ namespace :zenweb do
 end
 task default: "zenweb:generate"
 
+task :extra_wirings do
+  site = $website
+  page = site.pages
+
+  page["blog/index.html.erb"].depends_on site.categories.blog
+end
+
 desc "Run and reload the generated site"
 task :run do
   require "rerun"
@@ -39,6 +46,11 @@ task :run do
   system "open http://localhost:8000"
 
   runner.join
+end
+
+desc "Push .site to kejadlen/kejadlen.dev#gh-pages"
+task :push do
+
 end
 
 require "crosswords"
