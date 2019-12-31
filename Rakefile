@@ -14,6 +14,7 @@ CLEAN.include(config.out)
 task default: config.out
 
 site = FileList["#{config.src}/**/*"]
+  .include("#{config.src}/**/.*") # include dotfiles
   .map {|input| [input.pathmap("%{#{config.src},#{config.out}}p"), input] }
   .to_h
 task default: site.keys
