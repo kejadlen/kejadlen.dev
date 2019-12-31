@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2017 / 07 / 05
+        
+          /
+          <a href="/blog/2017/07/05/beachconf.html">beachconf</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>#beachconf</h2>
+        <p>At Pivotal Labs, when we&rsquo;re in between projects, we call it being on the
+&ldquo;beach&rdquo;. (I&rsquo;ve heard other consultancies call it the &ldquo;bench&rdquo;, which makes more
+sense to me.) While this may sound like a dream for a lot of people, we&rsquo;ve
+found that most people get bored/burned out on beach after a few weeks. In
+light of that, and to keep me more accountable, I&rsquo;ve decided to start keeping a
+log of what I&rsquo;m doing on the beach.</p>
+
+<h3 id="july-5">July 5</h3>
+
+<ul>
+  <li><a href="https://developer.apple.com/videos/play/wwdc17/212">What&rsquo;s New in Foundation</a> (WWDC)
+    <ul>
+      <li>This wasn&rsquo;t too informative; some nice improvements with Objective-C
+interop with <code>String</code>/<code>Range</code> and copy-on-write, but I don&rsquo;t use key paths
+or KVO a lot, so that was not as interesting. The addition of
+<a href="https://developer.apple.com/documentation/swift/codable">Codable</a> is greatly welcomed, though.</li>
+    </ul>
+  </li>
+  <li><a href="https://www.maa.org/sites/default/files/pdf/devlin/LockhartsLament.pdf">A Mathematician&rsquo;s Lament</a> (paper)
+    <ul>
+      <li>While I agree pretty much completely with the overall point, I did think it
+was overly harsh on math teachers.</li>
+    </ul>
+  </li>
+  <li><a href="https://developer.apple.com/videos/play/wwdc2017/245">Building Apps with Dynamic Type</a> (WWDC)
+    <ul>
+      <li>I&rsquo;ve always been impressed by Apple&rsquo;s accessibility support as a developer
+(I do use a handful of accessibility features on iOS, but not Dynamic
+Type), and it&rsquo;s cool to see Apple steadily improving in this area.</li>
+      <li>Both designers and devs are going to have to adjust to constraints based on
+baselines instead of the space between labels.</li>
+    </ul>
+  </li>
+  <li>Poked around at <a href="https://github.com/kejadlen/kilo-rs">my implementation</a> of <a href="http://viewsourcecode.org/snaptoken/kilo/index.html">Build Your Own Text
+Editor</a>.</li>
+</ul>
+
+<h3 id="july-6">July 6</h3>
+
+<ul>
+  <li>Poked around a bit more with <a href="https://github.com/kejadlen/kilo-rs">kilo.rs</a>. Realized that I need to
+handle <code>STDIN</code> differently, so I&rsquo;m going to let that simmer in my
+subconscious for a bit before continuing.</li>
+  <li><a href="https://vimeo.com/200077718">Life After Nil</a> (video)
+    <ul>
+      <li>Mostly skimmed through this talk about applying concepts learned from
+Haskell to Ruby. Not much new to me here, but validating to see that I&rsquo;ve
+reached similar conclusions as other people.</li>
+    </ul>
+  </li>
+  <li><a href="https://developer.apple.com/videos/play/wwdc2017/412/">Auto Layout Techniques in Interface Builder</a> (WWDC)
+    <ul>
+      <li>Learned a few neat tricks in this talk. I like how hard Apple&rsquo;s pushing
+Dynamic Type across their WWDC presentations. From my anecdotal experience,
+I&rsquo;ve seen a number of people on the bus using that accessibility feature.</li>
+    </ul>
+  </li>
+  <li>Wrote <a href="{{ site.baseurl }}{% post_url 2017-07-06-encrypting-stuff-in-git %}">a blog post on encrypting stuff in git</a>.</li>
+  <li><a href="http://www.thocp.net/biographies/papers/backus_turingaward_lecture.pdf">Can Programming Be Liberated from the von Neumann Style? A Functional Style
+and Its Algebra of Programs</a> (paper)
+    <ul>
+      <li>Basically Backus complaining about &ldquo;von Neumann style&rdquo; programming
+languages.  Interesting how not much seems to have changed in this regard
+since he wrote this in 1978.</li>
+    </ul>
+  </li>
+  <li><a href="http://haskell.cs.yale.edu/?post_type=publication&amp;p=366">An Experiment in Software Prototyping Productivity</a>
+(paper)
+    <ul>
+      <li>Some interesting findings, even keeping in mind the authorial bias for
+Haskell.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="july-10">July 10</h3>
+
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=lC5UWG5N8oY">Haskell taketh away: limiting side effects for parallel
+programming</a> (video)
+    <ul>
+      <li>GHC&rsquo;s intermediate language (System FC) has just 3 types and 15
+constructors!</li>
+      <li>Learned about <a href="https://wiki.haskell.org/Safe_Haskell">Safe Haskell</a>.</li>
+      <li>Not imperative vs. functional - really about determinism vs.
+non-determinism.</li>
+      <li>In-place parallel sorting inside of a pure function.</li>
+      <li>Didn&rsquo;t know that Haskell is still actively evolving.</li>
+    </ul>
+  </li>
+  <li>Bartosz Milewski&rsquo;s <a href="https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/">Category Theory for
+Programmers</a> (book)
+    <ul>
+      <li>
+        <blockquote>
+          <p>[T]esting is almost always a probabilistic rather than a deterministic
+process. Testing is a poor substitute for proof.</p>
+        </blockquote>
+      </li>
+      <li>The bottom type makes sense to me now on this re-read.</li>
+      <li>This is starting to realize some of the subjects from prior book clubs:
+operational and denotational semantics were covered in <a href="https://www.amazon.com/Understanding-Computation-Machines-Impossible-Programs/dp/1449329276/">Understanding
+Computation</a>.</li>
+      <li>
+        <blockquote>
+          <p>The initial object is the object that has one and only one morphism going
+to any object in the category.</p>
+        </blockquote>
+      </li>
+      <li><em>poset</em>: partially ordered set</li>
+      <li><code>Void</code> is different from <code>()</code></li>
+      <li>
+        <blockquote>
+          <p>The terminal object is the object with one and only one morphism coming
+to it from any object in the category.</p>
+        </blockquote>
+      </li>
+      <li>
+        <blockquote>
+          <p>There is the propositional equality, intensional equality, extensional
+equality, and equality as a path in homotopy type theory. And then there
+are the weaker notions of isomorphism, and even weaker of equivalence.</p>
+        </blockquote>
+      </li>
+    </ul>
+  </li>
+  <li><a href="https://developer.apple.com/videos/play/wwdc2017/403/">What&rsquo;s New in Signing for Xcode and Xcode Server</a>
+    <ul>
+      <li>Figured I should watch this, given how much trouble code signing gave us on
+my last project.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="july-11">July 11</h3>
+
+<ul>
+  <li><a href="https://bartoszmilewski.com/2015/01/13/simple-algebraic-data-types/">Simple Algebraic Data Types</a> in <a href="https://bartoszmilewski.com/2014/10/28/category-theory-for-programmers-the-preface/">Category Theory for
+Programmers</a> (book)
+    <ul>
+      <li>So I&rsquo;ve tried reading this book in the past and have gotten past here, but
+this is feeling much more understandable now that I&rsquo;ve watched some of
+<a href="https://www.youtube.com/playlist?list=PLbgaMIhjbmEnaH_LTkxLI7FMa2HsnawM_">Bartosz&rsquo;s lectures on category theory</a> and read
+Eugenia Cheng&rsquo;s <a href="http://eugeniacheng.com/math/books/">How to Bake Pi</a>.</li>
+    </ul>
+  </li>
+  <li><code>present.rb</code> (project)
+    <ul>
+      <li>I was volunteered to do a talk on <a href="http://pryrepl.org/">Pry</a> for work, so I have started
+yak shaving by writing a presentation tool that meets my personal
+requirements. More on this in a later post.</li>
+    </ul>
+  </li>
+  <li>Tutoring at <a href="http://adadevelopersacademy.org/">Ada Developers Academy</a>
+    <ul>
+      <li>The current cohort is working on capstones now, so there was an impressive
+breadth of technologies that I helped out with:
+        <ul>
+          <li>Getting a Parrot drone onto a WiFi network</li>
+          <li>Connecting to Intuit using an npm library</li>
+          <li>Redacting private information that was pushed to GitHub</li>
+          <li>Using Postgres with SQLAlchemy and Alembic</li>
+        </ul>
+      </li>
+      <li>It&rsquo;s always fascinating to me that I&rsquo;m still able to contribute despite not
+being an expert on many of the above areas. In the end, being exposed to
+similar issues and troubleshooting is a skill that&rsquo;s broadly applicable
+across all of these different problems.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="july-12">July 12</h3>
+
+<ul>
+  <li><a href="https://developer.apple.com/videos/play/wwdc2017/404/">Debugging with Xcode 9</a>
+    <ul>
+      <li>Yay for wireless debugging and view controllers in Xcode&rsquo;s view hierarchy,
+although there was a bunch of stuff on SpriteKit and SceneKit that I&rsquo;m not
+really interested in.</li>
+    </ul>
+  </li>
+  <li>Pry presentation
+    <ul>
+      <li>Finished the MVP for both the presentation tooling and the presentation
+itself. With those now done, I have a better idea of how to approach the
+problem &ldquo;for real&rdquo;, as it were.</li>
+    </ul>
+  </li>
+  <li><a href="https://www.cs.cmu.edu/~tom7/abc/">Compiling C to printable x86, to make an executable research
+paper</a> (video)
+    <ul>
+      <li>A great video explanation of making an x86 compiler that creates printable
+executables. Entertaining and educational.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="july-13">July 13</h3>
+
+<ul>
+  <li>Facilitated an inception for a new project.</li>
+</ul>
+
+<h3 id="july-14">July 14</h3>
+
+<ul>
+  <li><a href="https://github.com/kejadlen/kejadlen.github.io/tree/master/presentations">praesent</a>
+    <ul>
+      <li>Played around with making this more robust and less of a one-off
+experiment. Thought about making it more generic or using a Ruby DSL, but
+in the end, I don&rsquo;t really need that additional complexity and would rather
+keep it as simple as I can.</li>
+    </ul>
+  </li>
+</ul>
+
+
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2007 / 02 / 25
+        
+          /
+          <a href="/blog/2007/02/25/ruby-facebook.html">ruby-facebook</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>ruby-facebook</h2>
+        <p>Wow. (Okay, not exactly “using”, but close enough.) Came upon <a href="http://www.livelearncode.com/archives/14">RBook</a>, another Facebook API library for Ruby. I think that makes three so far. This one apparently takes a few techniques out of my own <a href="http://kejadlen.netherweb.com/ruby-facebook/doc">ruby-facebook</a> library, although I’m not quite sure what exactly.</p>
+
+<p>However, I still really dig several things about my implementation that I haven’t seen in other ones (yet). One is how you get the query response back as a Hash. Making a call to <code>Message.GetCount</code> will return a hash with <code>total</code> and <code>unread</code> as keys. Currently, the values for each key are autoconverted into integers if possible, as I make the assumption that a string consisting of all numbers is meant to be an actual number.</p>
+
+<p>Another nicety is that making API queries is a touch more natural (at least, in my opinion). Basically, the following calls are all valid (given that <code>f</code> is an instance of <code>Facebook::Session</code>):</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+</pre></td>
+  <td class="code"><pre>f.messages.get_count
+f.messages.getCount
+f.messages_get_count
+f.messages_getCount
+f.session_request(<span class="string"><span class="delimiter">&quot;</span><span class="content">messages.getCount</span><span class="delimiter">&quot;</span></span>)
+</pre></td>
+</tr></table>
+</div>
+
+<p>I happen to think that this is pretty nifty. The implementation is somewhat nastier, as I create another class to handle the subsequent message of <code>get_count</code> or <code>getCount</code>. I have a feeling that there’s a more elegant way to handle this, but I’m punting for now, as this works. (Possibly making an eigenclass from the current object that holds the request category? Hmm, it seems possible. Don’t know if it would be more elegant though.)</p>
+
+<p>The last nifty bit from my implementation is that to add new API calls, all you need to do (theoretically) is to dump them into <code>Facebook::REQUESTS</code>, which is an Array that holds the valid API calls.</p>
+
+<p>Not that there’s a right or wrong way to go about implementation and design, but those are just features of my library that I really dig.</p>
+
+<p>But speaking of <a href="http://kejadlen.netherweb.com/ruby-facebook/doc">ruby-facebook</a>, it’s about time that I updated it to match Facebook’s updated API. I haven’t touched it since August, so hopefully I’ll find some time to fix it up later this week. Writing some test cases would probably be a good idea, but I really don’t want to muck with testing base_request, as that would require me to figure out how to fake the Facebook server. The other thing that I should do is figure out how to get rid of <code>MetaSession</code>, but honestly, I think doing so in an elegant way is going to require much more thought and work than I’m willing to put into the update.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

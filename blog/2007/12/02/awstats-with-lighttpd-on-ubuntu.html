@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2007 / 12 / 02
+        
+          /
+          <a href="/blog/2007/12/02/awstats-with-lighttpd-on-ubuntu.html">awstats-with-lighttpd-on-ubuntu</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>AWStats with lighttpd on Ubuntu</h2>
+        <p>Throughout this post, I’ll use <code>foobar</code> as a fake domain. You should replace this with the appropriate domain(s) for your own use.</p>
+
+<p>First, install AWStats.</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre>$ sudo apt-get install awstats
+</pre></td>
+</tr></table>
+</div>
+
+<p><code>/etc/lighttpd.conf</code> will need to be modified; this will be slightly different if you want to use a directory instead of a subdomain to check your stats.</p>
+
+<h3 id="etclighttpdlighttpdconf">/etc/lighttpd/lighttpd.conf</h3>
+
+<div class="language-conf highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+</pre></td>
+  <td class="code"><pre>server.modules += ( &quot;mod_cgi&quot; )
+
+$HTTP[&quot;host&quot;] =~ &quot;stats.foobar&quot; {
+  alias.url = ( &quot;/icon/&quot; =&gt; &quot;/usr/share/awstats/icon/&quot;,
+                &quot;/css/&quot; =&gt; &quot;/usr/share/doc/awstats/examples/css/&quot;,
+                &quot;/cgi-bin/&quot; =&gt; &quot;/usr/lib/cgi-bin/&quot; )
+  cgi.assign = ( &quot;.pl&quot; =&gt; &quot;/usr/bin/perl&quot;, &quot;.cgi&quot; =&gt; &quot;/usr/bin/perl&quot; )
+}
+</pre></td>
+</tr></table>
+</div>
+
+<p>Make sure this works by visiting <code>http://stats.foobar/cgi-bin/awstats.pl</code>. You should get an error message from the AWStats CGI file.</p>
+
+<p>In <code>/etc/awstats</code>, make a <code>awstats.foobar.conf</code> file, replacing <code>foobar</code> with whatever is appropriate for your purposes.</p>
+
+<h3 id="etcawstatsawstatsfoobarconf">/etc/awstats/awstats.foobar.conf</h3>
+
+<div class="language-conf highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+</pre></td>
+  <td class="code"><pre>LogFile=&quot;/var/log/lighttpd/access.log&quot;
+LogType=W
+LogFormat=1
+SiteDomain=&quot;foobar&quot;
+HostAliases=&quot;localhost 127.0.0.1 REGEX[foobar$]&quot;
+DNSLookup=1
+DirData=&quot;/var/lib/awstats&quot;
+DirCgi=&quot;/cgi-bin&quot;
+DirIcons=&quot;/icon&quot;
+SkipHosts=&quot;127.0.0.1 localhost REGEX[^192\.168\.]&quot;
+</pre></td>
+</tr></table>
+</div>
+
+<p>Run <code>awstats.pl</code> to initialize the statistics database.</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre>$ sudo -u www-data /usr/lib/cgi-bin/awstats.pl -config=foobar -update
+</pre></td>
+</tr></table>
+</div>
+
+<p>Your stats should now be visible at <code>http://stats.foobar/cgi-bin/awstats.pl?config=foobar</code>.</p>
+
+<p>Now all that’s left is editing the crontab and logrotate configuration files to automatically populate the stats.</p>
+
+<h3 id="etccrondawstats">/etc/cron.d/awstats</h3>
+
+<div class="language-cron highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre>0,10,20,30,40,50 * * * * www-data [ -x /usr/lib/cgi-bin/awstats.pl -a -f /etc/awstats/awstats.foobar.conf -a -r /var/log/lighttpd/access.log ] &amp;amp;&amp;amp; /usr/lib/cgi-bin/awstats.pl -config=foobar -update &gt;/dev/null
+</pre></td>
+</tr></table>
+</div>
+
+<h3 id="etclogrotatedlighttpd">/etc/logrotate.d/lighttpd</h3>
+
+<div class="language-conf highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+</pre></td>
+  <td class="code"><pre>prerotate
+  /usr/lib/cgi-bin/awstats.pl -config=foobar -update
+endscript
+</pre></td>
+</tr></table>
+</div>
+
+      </article>
+    </main>
+  </body>
+</html>

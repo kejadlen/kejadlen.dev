@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2009 / 06 / 14
+        
+          /
+          <a href="/blog/2009/06/14/hpricot-is-awesome.html">hpricot-is-awesome</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Hpricot is awesome</h2>
+        <p>So I have to admit that after watching some <a href="http://video.nytimes.com/video/2009/04/18/magazine/1194839633989/pizza-at-home.html,">Kitchen 4B</a> I developed a bit of a crush on Jill Santopietro. Unfortunately, <a href="http://themoment.blogs.nytimes.com/">The Moment</a> only has a single RSS feed for the entire blog, and this includes a bunch of content I&rsquo;m not particularly interested in. But with some quick Hpricot magic, I quickly whipped up a script to use in NetNewsWire. (Also, much love for NetNewsWire enabling me to create subscriptions to scripts such as these.)</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">rubygems</span><span class="delimiter">'</span></span> <span class="comment"># Since I&quot;m too lazy to set the RUBYOPTS</span>
+                   <span class="comment"># environment variable for NetNewsWire</span>
+
+require <span class="string"><span class="delimiter">'</span><span class="content">hpricot</span><span class="delimiter">'</span></span>
+require <span class="string"><span class="delimiter">'</span><span class="content">open-uri</span><span class="delimiter">'</span></span>
+
+doc = <span class="constant">Hpricot</span>.XML(open(<span class="string"><span class="delimiter">'</span><span class="content">http://themoment.blogs.nytimes.com/feed/atom/</span><span class="delimiter">'</span></span>))
+
+(doc/<span class="symbol">:entry</span>).reject {|entry| (entry/<span class="symbol">:author</span>/<span class="symbol">:name</span>).inner_text =~ <span class="regexp"><span class="delimiter">/</span><span class="content">Jill Santopietro</span><span class="delimiter">/</span></span> }.remove
+
+puts doc.to_html
+</pre></td>
+</tr></table>
+</div>
+
+<p><strong>Edit:</strong> I&rsquo;ve since replaced this script with <a href="http://pipes.yahoo.com/kejadlen/58c7c48b0198b276d2a98c11e08179b5">a Yahoo Pipe</a>, as this allows me to view this feed in both Google Reader and NetNewsWire.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

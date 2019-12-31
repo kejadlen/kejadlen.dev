@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2009 / 04 / 30
+        
+          /
+          <a href="/blog/2009/04/30/draft-support-in-webby.html">draft-support-in-webby</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Draft support in Webby</h2>
+        <p>Because I&rsquo;m a) lazy and b) a huge nerd, I added support for drafts to this blog, which runs on <a href="http://webby.rubyforge.org/">Webby</a>. (<strong>Edit:</strong> But not anymore! It now uses <a href="http://nanoc.stoneship.org/">nanoc</a>.) It&rsquo;s fairly straightforward, requiring two new tasks in <code>blog.rake</code> and of course, the <code>draft.erb</code> template. As always, the latest code can be found <a href="http://github.com/kejadlen/the_alpha_newswire/tree/master">at my blog&rsquo;s github repo</a>.</p>
+
+<p>In <code>blog.rake</code>:</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+<a href="#n19" name="n19">19</a>
+<strong><a href="#n20" name="n20">20</a></strong>
+<a href="#n21" name="n21">21</a>
+<a href="#n22" name="n22">22</a>
+<a href="#n23" name="n23">23</a>
+<a href="#n24" name="n24">24</a>
+<a href="#n25" name="n25">25</a>
+<a href="#n26" name="n26">26</a>
+<a href="#n27" name="n27">27</a>
+<a href="#n28" name="n28">28</a>
+<a href="#n29" name="n29">29</a>
+<strong><a href="#n30" name="n30">30</a></strong>
+<a href="#n31" name="n31">31</a>
+<a href="#n32" name="n32">32</a>
+<a href="#n33" name="n33">33</a>
+<a href="#n34" name="n34">34</a>
+<a href="#n35" name="n35">35</a>
+<a href="#n36" name="n36">36</a>
+<a href="#n37" name="n37">37</a>
+<a href="#n38" name="n38">38</a>
+<a href="#n39" name="n39">39</a>
+<strong><a href="#n40" name="n40">40</a></strong>
+<a href="#n41" name="n41">41</a>
+<a href="#n42" name="n42">42</a>
+<a href="#n43" name="n43">43</a>
+<a href="#n44" name="n44">44</a>
+<a href="#n45" name="n45">45</a>
+<a href="#n46" name="n46">46</a>
+<a href="#n47" name="n47">47</a>
+<a href="#n48" name="n48">48</a>
+</pre></td>
+  <td class="code"><pre>desc <span class="string"><span class="delimiter">'</span><span class="content">Create a new draft</span><span class="delimiter">'</span></span>
+task <span class="string"><span class="delimiter">'</span><span class="content">draft</span><span class="delimiter">'</span></span> <span class="keyword">do</span> |t|
+  page, title, dir = <span class="constant">Webby</span>::<span class="constant">Builder</span>.new_page_info
+  title = <span class="constant">Webby</span>.site.args.raw[<span class="integer">0</span>] <span class="comment"># undo the titlecasing</span>
+
+  raise <span class="string"><span class="delimiter">&quot;</span><span class="content">Don't specify a directory for a blog post!</span><span class="delimiter">&quot;</span></span> <span class="keyword">unless</span> dir.empty?
+
+  page = <span class="constant">File</span>.join(<span class="constant">Webby</span>.site.draft_dir, <span class="constant">File</span>.basename(page))
+  page = <span class="constant">Webby</span>::<span class="constant">Builder</span>.create(page,
+                               <span class="symbol">:from</span> =&gt; <span class="constant">File</span>.join(<span class="constant">Webby</span>.site.template_dir, <span class="string"><span class="delimiter">'</span><span class="content">blog</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">draft.erb</span><span class="delimiter">'</span></span>),
+                               <span class="symbol">:locals</span> =&gt; {
+                                  <span class="symbol">:title</span> =&gt; title,
+                                  <span class="symbol">:directory</span> =&gt; <span class="constant">Webby</span>.site.draft_dir })
+  <span class="constant">Webby</span>.exec_editor(page)
+<span class="keyword">end</span>
+
+desc <span class="string"><span class="delimiter">'</span><span class="content">Publish a draft</span><span class="delimiter">'</span></span>
+task <span class="string"><span class="delimiter">'</span><span class="content">publish_draft</span><span class="delimiter">'</span></span> <span class="keyword">do</span> |t|
+  site = <span class="constant">Webby</span>.site
+  draft = site.args.raw[<span class="integer">0</span>]
+  drafts = <span class="constant">Dir</span>[<span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>site.content_dir<span class="inline-delimiter">}</span></span><span class="content">/</span><span class="inline"><span class="inline-delimiter">#{</span>site.draft_dir<span class="inline-delimiter">}</span></span><span class="content">/*</span><span class="inline"><span class="inline-delimiter">#{</span>draft<span class="inline-delimiter">}</span></span><span class="content">*.txt</span><span class="delimiter">&quot;</span></span>]
+
+  raise <span class="string"><span class="delimiter">&quot;</span><span class="content">No drafts matching '</span><span class="inline"><span class="inline-delimiter">#{</span>draft<span class="inline-delimiter">}</span></span><span class="content">'</span><span class="delimiter">&quot;</span></span> <span class="keyword">if</span> drafts.empty?
+
+  raise <span class="string"><span class="delimiter">&quot;</span><span class="content">Found multiple drafts matching '</span><span class="inline"><span class="inline-delimiter">#{</span>draft<span class="inline-delimiter">}</span></span><span class="content">': </span><span class="inline"><span class="inline-delimiter">#{</span>drafts.map {|d| <span class="constant">File</span>.basename(d) }.join(<span class="string"><span class="delimiter">'</span><span class="content">, </span><span class="delimiter">'</span></span>)<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span> <span class="keyword">if</span> drafts.size &gt; <span class="integer">1</span>
+
+  <span class="comment"># drafts.size == 1</span>
+  draft = drafts[<span class="integer">0</span>]
+  draft = <span class="constant">Webby</span>::<span class="constant">Resources</span>::<span class="constant">Page</span>.new(draft)
+
+  now = <span class="constant">Time</span>.now
+  year = now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y</span><span class="delimiter">'</span></span>)
+  month = now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%m</span><span class="delimiter">'</span></span>)
+  day = now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%d</span><span class="delimiter">'</span></span>)
+
+  dir = <span class="constant">File</span>.join(<span class="constant">Webby</span>.site.blog_dir, year, month, day)
+  page = <span class="constant">File</span>.join(dir, draft.name)
+
+  page = <span class="constant">Webby</span>::<span class="constant">Builder</span>.create(page,
+                               <span class="symbol">:from</span> =&gt; <span class="constant">File</span>.join(<span class="constant">Webby</span>.site.template_dir, <span class="string"><span class="delimiter">'</span><span class="content">blog</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">post.erb</span><span class="delimiter">'</span></span>),
+                               <span class="symbol">:locals</span> =&gt; {
+                                  <span class="symbol">:title</span> =&gt; draft._meta_data[<span class="string"><span class="delimiter">'</span><span class="content">title</span><span class="delimiter">'</span></span>],
+                                  <span class="symbol">:directory</span> =&gt; dir,
+                                  <span class="symbol">:created_at</span> =&gt; now.to_y,
+                                  <span class="symbol">:body</span> =&gt; draft._read })
+  <span class="constant">Logging</span>::<span class="constant">Logger</span>[<span class="string"><span class="delimiter">'</span><span class="content">Webby</span><span class="delimiter">'</span></span>].info <span class="string"><span class="delimiter">&quot;</span><span class="content">deleting </span><span class="inline"><span class="inline-delimiter">#{</span>draft.path<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+  <span class="constant">FileUtils</span>.rm(draft.path)
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>This does require the modifications to the <code>create_year_index</code> and <code>create_month_index</code> tasks I made, but should be relatively straightforward to port back into the <code>blog.rake</code> file included with Webby&rsquo;s blog template.</p>
+
+<p>To use this, I create draft posts using <code>webby blog:draft "Some draft title"</code> and when I&rsquo;m ready to actually post the article, <code>webby blog:publish_draft title</code>. (The argument for <code>publish_draft</code> is used in a regex to locate the draft to publish.)</p>
+
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2006 / 11 / 16
+        
+          /
+          <a href="/blog/2006/11/16/playing-with-rubyosa-and-itunes.html">playing-with-rubyosa-and-itunes</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Playing with RubyOSA and iTunes</h2>
+        <p>I wanted to create a playlist based off played count versus skipped count, so some playing around with <a href="http://rubyosa.rubyforge.org/">RubyOSA</a> was warranted. Unfortunately, although the iPod updates iTunes with the play count of songs, it doesn’t do so for the skipped count! I am sorely disappointed.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">rbosa</span><span class="delimiter">'</span></span>
+
+itunes = <span class="constant">OSA</span>.app(<span class="string"><span class="delimiter">'</span><span class="content">iTunes</span><span class="delimiter">'</span></span>)
+
+music = itunes.current_playlist
+music.name  <span class="comment">#=&gt; &quot;Music&quot;</span>
+tracks = music.tracks
+
+sum = tracks.inject(<span class="integer">0</span>) {|n,i| n + i.played_count }  <span class="comment">#=&gt; 3871</span>
+average = sum / tracks.size.to_f  <span class="comment">#=&gt; 3.61100746268657</span>
+
+std_dev = (tracks.map {|t| (t.played_count - average)**<span class="integer">2</span> }.inject(<span class="integer">0</span>) {|n,i| n + i } / tracks.size.to_f)**<span class="float">0.5</span>  <span class="comment">#=&gt; 5.63593796507849</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>Caveat: I couldn’t figure out how to grab a specific playlist, so this snippet of code only works on the current playlist.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

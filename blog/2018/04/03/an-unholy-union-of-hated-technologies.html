@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2018 / 04 / 03
+        
+          /
+          <a href="/blog/2018/04/03/an-unholy-union-of-hated-technologies.html">an-unholy-union-of-hated-technologies</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>An unholy union of hated technologies</h2>
+        <p>So recently, <a href="https://gist.github.com/kejadlen/67f28ed8f618bb7e60a1c22b2f048007">I did a thing</a>.</p>
+
+<p>It all started with a question posed by one of my coworkers:</p>
+
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">Dear tech Twitter: anyone have any recommendations for a plain text, human-readable database format? Small amount of data, which I want to be able to read myself.<br /><br />So far I&#39;ve found GNU recutils: <a href="https://t.co/sjaDQZcf0W">https://t.co/sjaDQZcf0W</a></p>&mdash; Arthaey Angosii (@arthaey) <a href="https://twitter.com/arthaey/status/980091074398990339?ref_src=twsrc%5Etfw">March 31, 2018</a></blockquote>
+<script async="" src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<p>This seems like a pretty straightforward request, and one that I expected to
+have a recommendation for, but nothing came to mind. So naturally, I turned
+towards two of my favorite bang-for-your-buck technologies. YAML, for
+human-read-and-write-ability and machine-parsability, and ActiveRecord + pry
+for querying and data manipulation. Not only that, but I knew that there
+already existed a convenient bridge between the two, since <a href="http://guides.rubyonrails.org/testing.html#the-low-down-on-fixtures">Rails comes with a
+way to load YAML fixtures into ActiveRecord</a>.</p>
+
+<p>It&rsquo;s been a while since I&rsquo;ve done any Rails, but some cursory Googling produced
+the necessary code to create an in-memory SQLite database without any Rails:</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre><span class="constant">ActiveRecord</span>::<span class="constant">Base</span>.establish_connection(<span class="key">adapter</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">sqlite3</span><span class="delimiter">&quot;</span></span>, <span class="key">database</span>: <span class="string"><span class="delimiter">&quot;</span><span class="content">:memory:</span><span class="delimiter">&quot;</span></span>)
+</pre></td>
+</tr></table>
+</div>
+
+<p>Some more Googling and source-diving quickly resulted in finding <a href="https://github.com/rails/rails/blob/master/activerecord/lib/active_record/fixtures.rb#L531">a
+promising-looking method for loading fixtures manually</a>, so I
+created a sample <code>sites.yml</code> file based on the fixtures documentation and gave
+it a shot:</p>
+
+<div class="language-yaml highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+</pre></td>
+  <td class="code"><pre><span class="key">rubyonrails</span>:
+  <span class="key">name</span>: <span class="string"><span class="content">Ruby on Rails</span></span>
+  <span class="key">url</span>: <span class="string"><span class="content">http://www.rubyonrails.org</span></span>
+
+<span class="key">google</span>:
+  <span class="key">name</span>: <span class="string"><span class="content">Google</span></span>
+  <span class="key">url</span>: <span class="string"><span class="content">http://www.google.com</span></span>
+</pre></td>
+</tr></table>
+</div>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+</pre></td>
+  <td class="code"><pre><span class="keyword">class</span> <span class="class">Site</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>
+<span class="keyword">end</span>
+
+<span class="constant">ActiveRecord</span>::<span class="constant">FixtureSet</span>.create_fixtures(__dir__, <span class="constant">Dir</span>[<span class="string"><span class="delimiter">&quot;</span><span class="content">*.yml</span><span class="delimiter">&quot;</span></span>])
+</pre></td>
+</tr></table>
+</div>
+
+<p>It was no surprise that this didn&rsquo;t work, but it didn&rsquo;t take long to work
+through the error messages to first strip the file names of the <code>.yml</code>
+extension:</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre><span class="constant">ActiveRecord</span>::<span class="constant">FixtureSet</span>.create_fixtures(__dir__, <span class="constant">Dir</span>[<span class="string"><span class="delimiter">&quot;</span><span class="content">*.yml</span><span class="delimiter">&quot;</span></span>].map {|file| <span class="constant">File</span>.basename(file, <span class="string"><span class="delimiter">&quot;</span><span class="content">.yml</span><span class="delimiter">&quot;</span></span>) })
+</pre></td>
+</tr></table>
+</div>
+
+<p>And then, writing a schema so ActiveRecord would know the structure of the
+entities:</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+</pre></td>
+  <td class="code"><pre><span class="constant">ActiveRecord</span>::<span class="constant">Schema</span>.define(<span class="key">version</span>: <span class="integer">1</span>) <span class="keyword">do</span>
+  create_table <span class="symbol">:sites</span> <span class="keyword">do</span> |t|
+    t.text <span class="symbol">:name</span>
+    t.text <span class="symbol">:url</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>And thus, we arrive at a working MVP of a human-readable, human-writable,
+and database-queryable tool:</p>
+
+<div class="language-sh highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+</pre></td>
+  <td class="code"><pre>❯ be ruby yaml_sql.rb 
+-- create_table(:sites)
+   -&gt; 0.0143s
+
+From: sqyaml.rb @ line 19 :
+
+    14: end
+    15: 
+    16: ActiveRecord::FixtureSet.create_fixtures(__dir__, Dir[&quot;*.yml&quot;].map {|file| File.basename(file, &quot;.yml&quot;) })
+    17: 
+    18: require &quot;pry&quot;
+ =&gt; 19: binding.pry
+
+(main)&gt; Site.all
+=&gt; [#&lt;Site:0x00007fede4c005d8 id: 350860022, name: &quot;Ruby on Rails&quot;, url: &quot;http://www.rubyonrails.org&quot;&gt;, #&lt;Site:0x00007fede43661e8 id: 622654802, name: &quot;Google&quot;, url: &quot;http://www.google.com&quot;&gt;]
+(main)&gt; 
+</pre></td>
+</tr></table>
+</div>
+
+<p>So, lots of people hate on Ruby, YAML, and ActiveRecord, but being able to
+produce this proof of concept in about half an hour is pretty great.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

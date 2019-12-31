@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2008 / 12 / 02
+        
+          /
+          <a href="/blog/2008/12/02/itunes-rating-with-rubyosa.html">itunes-rating-with-rubyosa</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>iTunes ratings with RubyOSA</h2>
+        <p>Rating songs is a pain. Since iTunes keeps track of played and skipped counts, I thought I could use those to create new ratings.</p>
+
+<p>In actuality, I was too lazy to analyze the data with a stat package, so I opted for something a little simpler. I decided to use <code>played / (played + skipped)</code> as a metric and add a string to the comments field of the song if it met a threshold for that calculation.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+<a href="#n19" name="n19">19</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">rbosa</span><span class="delimiter">'</span></span>
+
+<span class="constant">OSA</span>.utf8_strings = <span class="predefined-constant">true</span>
+itunes = <span class="constant">OSA</span>.app(<span class="string"><span class="delimiter">'</span><span class="content">iTunes</span><span class="delimiter">'</span></span>)
+library = itunes.sources.find {|source| source.name == <span class="string"><span class="delimiter">'</span><span class="content">Library</span><span class="delimiter">'</span></span> }.playlists[<span class="integer">0</span>].tracks
+
+library.each <span class="keyword">do</span> |track|
+  count = (track.played_count + track.skipped_count).to_f
+  stat = track.played_count / count
+  comment = track.comment
+  <span class="keyword">if</span> count &gt; <span class="integer">5</span> <span class="keyword">and</span> stat &gt; <span class="float">0.95</span> <span class="keyword">and</span> track.video_kind == <span class="constant">OSA</span>::<span class="constant">ITunes</span>::<span class="constant">EVDK</span>::<span class="constant">NONE</span>
+    comment &lt;&lt; <span class="string"><span class="delimiter">&quot;</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> <span class="keyword">unless</span> track.comment.empty?
+    comment &lt;&lt; <span class="string"><span class="delimiter">&quot;</span><span class="content">AlphaRating: 5</span><span class="delimiter">&quot;</span></span>
+    track.comment = comment
+  <span class="keyword">elsif</span> track.comment =~ <span class="regexp"><span class="delimiter">/</span><span class="content">AlphaRating: 5</span><span class="delimiter">/</span></span>
+    comment.sub!(<span class="regexp"><span class="delimiter">/</span><span class="char">\n</span><span class="content">?AlphaRating: 5</span><span class="delimiter">/</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>)
+    track.comment = comment
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+      </article>
+    </main>
+  </body>
+</html>

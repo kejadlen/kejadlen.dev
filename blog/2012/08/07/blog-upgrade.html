@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2012 / 08 / 07
+        
+          /
+          <a href="/blog/2012/08/07/blog-upgrade.html">blog-upgrade</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Blog upgrade!</h2>
+        <p>With <a href="http://webby.rubyforge.org/">Webby</a> being <a href="https://groups.google.com/forum/?fromgroups#!topic/webby-forum/QTYsgsY_UnY%5B1-25%5D">deprecated</a>, I intended on moving this blog over to <a href="https://github.com/mojombo/jekyll/">Jekyll</a>, as it&rsquo;s supported natively by <a href="http://pages.github.com/">GitHub Pages</a>. This would have allowed me to use a single repository for this blog, instead of having one repo for the source and a second which would hold the &ldquo;build&rdquo; that would be hosted by GitHub.</p>
+
+<p>Unfortunately, I quickly bumped up against Jekyll&rsquo;s limitations, mainly due to the <a href="http://liquidmarkup.org/">Liquid</a> templating language that Jekyll uses. To accomplish what I wanted to do, I would need to add my own <a href="https://github.com/mojombo/jekyll/wiki/Plugins">plugins to Jekyll/Liquid</a>. This more or less defeats the original choice of Jekyll, as I wouldn&rsquo;t be able to use a single repository. And once that became obvious, I figured I may as well evaluate other static site generators.</p>
+
+<p>Some research on Google quickly revealed two main candidates that appealed to me: <a href="http://middlemanapp.com/">Middleman</a> and <a href="http://nanoc.stoneship.org/">nanoc</a>. After fiddling around with a test blog and some sample posts in both, I settled on nanoc. Middleman felt more powerful, but I preferred the simplicity of nanoc. (Perhaps because it&rsquo;s more like Webby, which is what I was familiar with.)</p>
+
+<p>As I was upgrading the &ldquo;backend&rdquo;, I also wanted to pretty up the frontend a bit. Not the smartest decision, as I was now also investigating HTML/CSS frameworks alongside the static site generators. But since I know far less about the former, I chose <a href="http://foundation.zurb.com/">Foundation</a>, mostly since it allows for a <a href="http://foundation.zurb.com/docs/gem-install.php#mixins">semantic grid</a> using <a href="http://compass-style.org/">Compass</a>. (Although I knew I didn&rsquo;t want to use <a href="http://twitter.github.com/bootstrap/">Bootstrap</a> since it&rsquo;s so prevalent across the web.)</p>
+
+<p>And finally, here&rsquo;s the end result of all that work! It didn&rsquo;t take me <a href="http://erjjones.github.com/blog/How-I-built-my-blog-in-one-day/">one day</a>, but it was rather satisfying nonetheless. The hardest part was getting everything to work together, and figuring out how nano&rsquo;s <a href="http://nanoc.stoneship.org/docs/4-basic-concepts/#rules">rules</a> worked, but as usual, most of the answers were just a Google search away.</p>
+
+<p>One last note: if you do have to use two repositories for hosting a site on GitHub, I highly recommend using a <a href="http://git-scm.com/book/en/Git-Tools-Submodules">submodule</a> for the build. For this blog, I added the GitHub Pages repo (<a href="https://github.com/kejadlen/kejadlen.github.com">kejadlen.github.com</a>) as a subdirectory of the main repo (<a href="https://github.com/kejadlen/kejadlen.net">kejadlen.net</a>) so that I could build the site straight into the build repo. (Or you could add a rake task to dump the output dir into the build repo. Either works, but I find this more convenient.)</p>
+
+<p>The source for this blog is available on GitHub <a href="https://github.com/kejadlen/kejadlen.net">here</a>.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

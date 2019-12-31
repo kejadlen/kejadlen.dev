@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2009 / 04 / 27
+        
+          /
+          <a href="/blog/2009/04/27/making-a-sitemap-in-webby.html">making-a-sitemap-in-webby</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Making a sitemap in Webby</h2>
+        <p>The code for making a sitemap in Webby:</p>
+
+<div class="language-erb highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+</pre></td>
+  <td class="code"><pre><span class="preprocessor">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="tag">&lt;urlset</span> <span class="attribute-name">xmlns</span>=<span class="string"><span class="delimiter">&quot;</span><span class="content">http://www.sitemaps.org/schemas/sitemap/0.9</span><span class="delimiter">&quot;</span></span><span class="tag">&gt;</span>
+<span class="inline"><span class="inline-delimiter">&lt;%</span>
+  <span class="instance-variable">@pages</span>.find(<span class="symbol">:all</span>,
+              <span class="symbol">:in_directory</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="delimiter">'</span></span>,
+              <span class="symbol">:extension</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">html</span><span class="delimiter">'</span></span>,
+              <span class="symbol">:recursive</span> =&gt; <span class="predefined-constant">true</span>,
+              <span class="symbol">:draft</span> =&gt; <span class="predefined-constant">nil</span>).each <span class="keyword">do</span> |page|
+<span class="inline-delimiter">-%&gt;</span></span>
+<span class="tag">&lt;url&gt;</span>
+  <span class="tag">&lt;loc&gt;</span><span class="inline"><span class="inline-delimiter">&lt;%=</span> <span class="constant">Webby</span>.site.base <span class="inline-delimiter">%&gt;</span></span><span class="inline"><span class="inline-delimiter">&lt;%=</span> page.url <span class="inline-delimiter">%&gt;</span></span><span class="tag">&lt;/loc&gt;</span>
+  <span class="tag">&lt;lastmod&gt;</span><span class="inline"><span class="inline-delimiter">&lt;%=</span> page.mtime.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y-%m-%d</span><span class="delimiter">'</span></span>) <span class="inline-delimiter">%&gt;</span></span><span class="tag">&lt;/lastmod&gt;</span>
+  <span class="tag">&lt;priority&gt;</span><span class="inline"><span class="inline-delimiter">&lt;%=</span> page.blog_post ? <span class="integer">1</span> : <span class="float">0.8</span> <span class="inline-delimiter">%&gt;</span></span><span class="tag">&lt;/priority&gt;</span>
+<span class="tag">&lt;/url&gt;</span>
+<span class="inline"><span class="inline-delimiter">&lt;%</span> <span class="keyword">end</span> <span class="inline-delimiter">-%&gt;</span></span>
+<span class="tag">&lt;/urlset&gt;</span>
+</pre></td>
+</tr></table>
+</div>
+
+      </article>
+    </main>
+  </body>
+</html>

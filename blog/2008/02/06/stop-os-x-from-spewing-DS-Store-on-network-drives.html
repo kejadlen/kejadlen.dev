@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2008 / 02 / 06
+        
+          /
+          <a href="/blog/2008/02/06/stop-os-x-from-spewing-DS-Store-on-network-drives.html">stop-os-x-from-spewing-DS-Store-on-network-drives</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Stop OS X from spewing .DS_Store on network drives</h2>
+        <p>This is something that should be widely known by now, but is strangely not.</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre>$ defaults write com.apple.desktopservices DSDontWriteNetworkStores true
+</pre></td>
+</tr></table>
+</div>
+
+<p>This will come in useful later on when I post on how to use NFS and SMB to share files between Ubuntu and OS X.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

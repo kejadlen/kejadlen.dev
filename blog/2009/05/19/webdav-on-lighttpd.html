@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2009 / 05 / 19
+        
+          /
+          <a href="/blog/2009/05/19/webdav-on-lighttpd.html">webdav-on-lighttpd</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>WebDAV on lighttpd</h2>
+        <p>I did this to use <a href="http://www.xmarks.com/">XMarks</a> on my own server. In <code>lighttpd.conf</code>:</p>
+
+<div class="language-conf highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+</pre></td>
+  <td class="code"><pre>$HTTP[&quot;host&quot;] =~ &quot;xmarks.foobar.com&quot; {
+  server.document-root = &quot;/path/to/xmarks/dir&quot;
+  webdav.activate = &quot;enable&quot;
+  webdav.is-readonly = &quot;disable&quot;
+  webdav.sqlite-db-name = &quot;/var/run/lighttpd/lighttpd.webdav_lock.db&quot;
+  auth.backend = &quot;htdigest&quot;
+  auth.backend.htdigest.userfile = &quot;/path/to/xmarks/dir/.passwd&quot;
+  auth.require = ( &quot;&quot; =&gt; ( &quot;method&quot; =&gt; &quot;digest&quot;,
+                           &quot;realm&quot; =&gt; &quot;webdav&quot;,
+                           &quot;require&quot; =&gt; &quot;valid-user&quot; ) )
+</pre></td>
+</tr></table>
+</div>
+
+<p>Then on the command line:</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+</pre></td>
+  <td class="code"><pre>$ sudo apt-get install apache2-utils
+$ cd /path/to/xmarks/dir
+$ htdigest -c .passwd webdav USERNAME
+</pre></td>
+</tr></table>
+</div>
+
+      </article>
+    </main>
+  </body>
+</html>
