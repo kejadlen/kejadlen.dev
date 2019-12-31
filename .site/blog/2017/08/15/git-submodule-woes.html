@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2017 / 08 / 15
+        
+          /
+          <a href="/blog/2017/08/15/git-submodule-woes.html">git-submodule-woes</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Git submodule woes</h2>
+        <p>So, I &lt;3 git submodules (and use them extensively for organizing my personal
+repos), but there are moments where knowing a bit about how they work under the
+hood becomes invaluable. This is the second time I&rsquo;ve hit this particular
+issue, so I thought I&rsquo;d document it for future posterity.</p>
+
+<p>I&rsquo;ve found that for the most part, you can stay out of trouble with submodules
+in personal repos by staying on the well-trodden path, but changes in
+submodules in an upstream repo can have unexpected results.</p>
+
+<p>Namely, this is the error that I saw when the upstream repo changed the URL of
+a submodule:</p>
+
+<div class="language-shell highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+</pre></td>
+  <td class="code"><pre>❯ git submodule update --checkout
+error: Server does not allow request for unadvertised object 3ad94b659910c775a6560c45b1524d23d8c83b09
+Fetched in submodule path 'modules/prompt/external/agnoster', but it did not contain 3ad94b659910c775a6560c45b1524d23d8c83b09. Direct fetching of that commit failed.
+</pre></td>
+</tr></table>
+</div>
+
+<p>I won&rsquo;t go into details for how I figured out the root cause, partially since I
+had seen this same error in the past and have long since forgotten how I
+diagnosed it back then. Regardless, I knew that it was an issue with the remote
+URL for the upstream repo.</p>
+
+<p>My gut says that there&rsquo;s probably a git submodule command you can run to
+re-init all of those, but it was faster for me to just edit the git config
+directly for the submodule.</p>
+
+<p>The actual location in my case is a little strange since it&rsquo;s a submodule
+within another submodule, but the main thing you need to know is that the git
+config folder for a submodule is located in the <code>.git/modules</code> folder, with the
+same path as in the actual repo. You can see in the path below that the first
+submodule is at <code>src/prezto</code> and the second one at
+<code>modules/prompt/external/agnoster/config</code>.</p>
+
+<p><code>.git/modules/src/prezto/modules/modules/prompt/external/agnoster/config</code></p>
+
+<p>Opening this config up revealed the following git remote:</p>
+
+<div class="language-conf highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+</pre></td>
+  <td class="code"><pre>[remote &quot;origin&quot;]
+  url = https://gist.github.com/3712874.git
+  fetch = +refs/heads/*:refs/remotes/origin/*
+</pre></td>
+</tr></table>
+</div>
+
+<p>A quick look at the <a href="https://github.com/sorin-ionescu/prezto/tree/master/modules/prompt/external">canonical prezto repo</a> showed what the
+<code>agnoster</code> remote URL should be:</p>
+
+<div class="language-conf highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+</pre></td>
+  <td class="code"><pre>[remote &quot;origin&quot;]
+  url = https://github.com/agnoster/agnoster-zsh-theme.git
+  fetch = +refs/heads/*:refs/remotes/origin/*
+</pre></td>
+</tr></table>
+</div>
+
+<p>And with that done, running <code>git submodule update --checkout</code> worked.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2007 / 12 / 30
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Generating animated GIFs using RMagick</h2>
+        <p>Sample code:</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+</pre></td>
+  <td class="code"><pre>anim = <span class="constant">Magick</span>::<span class="constant">ImageList</span>.new(*<span class="constant">Dir</span>[<span class="string"><span class="delimiter">&quot;</span><span class="content">/some/path/*.jpg</span><span class="delimiter">&quot;</span></span>])
+anim.each {|img| img.resize!(<span class="integer">200</span>,<span class="integer">200</span>) }
+anim.delay = <span class="integer">10</span>
+anim.unshift <span class="constant">Magick</span>::<span class="constant">Image</span>.read(<span class="string"><span class="delimiter">&quot;</span><span class="content">/some/image.jpg</span><span class="delimiter">&quot;</span></span>)[<span class="integer">0</span>].resize(<span class="integer">200</span>,<span class="integer">200</span>)
+anim &lt;&lt; <span class="constant">Magick</span>::<span class="constant">Image</span>.read(<span class="string"><span class="delimiter">&quot;</span><span class="content">/some/other/image.jpg</span><span class="delimiter">&quot;</span></span>)[<span class="integer">0</span>].resize(<span class="integer">200</span>,<span class="integer">200</span>)
+anim.write(<span class="string"><span class="delimiter">&quot;</span><span class="content">animated.gif</span><span class="delimiter">&quot;</span></span>)
+</pre></td>
+</tr></table>
+</div>
+
+<p>Example image:
+{% include img name=&rdquo;gloria.gif&rdquo; %}</p>
+
+      </article>
+    </main>
+  </body>
+</html>

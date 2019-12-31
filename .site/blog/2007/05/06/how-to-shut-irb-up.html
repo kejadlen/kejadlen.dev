@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2007 / 05 / 06
+        
+          /
+          <a href="/blog/2007/05/06/how-to-shut-irb-up.html">how-to-shut-irb-up</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>How to shut irb up</h2>
+        <p>From <a href="http://groups.google.com/group/comp.lang.ruby/browse_thread/thread/9c1febbe05513dc0/b9d4686b270e4f50">ruby-talk</a>, how to shut irb up:</p>
+
+<h3 id="irbrc">.irbrc</h3>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre><span class="constant">IRB</span>.conf[<span class="symbol">:PROMPT</span>][ <span class="constant">IRB</span>.conf[<span class="symbol">:PROMPT_MODE</span>] ][<span class="symbol">:RETURN</span>]=<span class="string"><span class="delimiter">'</span><span class="delimiter">'</span></span> 
+</pre></td>
+</tr></table>
+</div>
+
+<p>Now irb won’t display the return value of the entered statement! Wonderful!</p>
+
+<p>However, this does break <a href="http://pablotron.org/software/wirble/">Wirble</a>’s colorize, as Wirble can’t colorize what doesn’t get displayed. But I can make a function called <code>pc</code> (for <code>p color</code>) which uses Wirble’s colorizing algorithm:</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">wirble</span><span class="delimiter">'</span></span>
+
+<span class="keyword">def</span> <span class="function">pc</span>(*ary)
+  ary.each <span class="keyword">do</span> |obj|
+    puts <span class="constant">Wirble</span>::<span class="constant">Colorize</span>.colorize(obj.inspect)
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p><strong>Edit</strong>: Fixed pc to work with multiple arguments.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

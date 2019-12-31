@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2009 / 04 / 19
+        
+          /
+          <a href="/blog/2009/04/19/importing-posts-from-typo-to-webby.html">importing-posts-from-typo-to-webby</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Importing posts from Typo to Webby</h2>
+        <p>In the process of moving this blog from <a href="http://wiki.github.com/fdv/typo/">Typo</a> to <a href="http://webby.rubyforge.org/">Webby</a>, it quickly became obvious that copying the blog posts over by hand was not an option. Searching on Google led me to a <a href="http://www.locomotivation.com/blog/2008/11/21/migrating-to-webby.html">task for importing the posts using an RSS feed</a>, but since I used an SQLite3 database with Typo, I thought it would be easier to just grab the posts directly from the database file.</p>
+
+<p>The bulk of the changes are in <a href="http://github.com/kejadlen/the_alpha_newswire/commit/93ad250e9402355de5adcdcad6a36a9586bc0478">this changelist on GitHub</a>, but I made a few more modifications to the process that are included in later changelists.</p>
+
+<p><code>tasks/blog.rake</code> differs mainly in that it uses the actual database instead of an RSS feed and has regular expressions to convert my Typo code highlighting to use Webby&rsquo;s <code>UltraVioletHelper</code>. The code is also cleaned up a bit, to use Rake arguments instead of passing around the created_at time as an ENV variable and also to avoid copying <code>Webby::Apps::Main#capture_command_line_args</code>. Changing the database source is left as an exercise for the reader.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+<a href="#n19" name="n19">19</a>
+<strong><a href="#n20" name="n20">20</a></strong>
+<a href="#n21" name="n21">21</a>
+<a href="#n22" name="n22">22</a>
+<a href="#n23" name="n23">23</a>
+<a href="#n24" name="n24">24</a>
+<a href="#n25" name="n25">25</a>
+<a href="#n26" name="n26">26</a>
+<a href="#n27" name="n27">27</a>
+<a href="#n28" name="n28">28</a>
+<a href="#n29" name="n29">29</a>
+<strong><a href="#n30" name="n30">30</a></strong>
+<a href="#n31" name="n31">31</a>
+<a href="#n32" name="n32">32</a>
+<a href="#n33" name="n33">33</a>
+<a href="#n34" name="n34">34</a>
+<a href="#n35" name="n35">35</a>
+<a href="#n36" name="n36">36</a>
+<a href="#n37" name="n37">37</a>
+<a href="#n38" name="n38">38</a>
+<a href="#n39" name="n39">39</a>
+<strong><a href="#n40" name="n40">40</a></strong>
+<a href="#n41" name="n41">41</a>
+<a href="#n42" name="n42">42</a>
+<a href="#n43" name="n43">43</a>
+<a href="#n44" name="n44">44</a>
+<a href="#n45" name="n45">45</a>
+<a href="#n46" name="n46">46</a>
+<a href="#n47" name="n47">47</a>
+<a href="#n48" name="n48">48</a>
+<a href="#n49" name="n49">49</a>
+<strong><a href="#n50" name="n50">50</a></strong>
+<a href="#n51" name="n51">51</a>
+<a href="#n52" name="n52">52</a>
+<a href="#n53" name="n53">53</a>
+<a href="#n54" name="n54">54</a>
+<a href="#n55" name="n55">55</a>
+<a href="#n56" name="n56">56</a>
+</pre></td>
+  <td class="code"><pre>desc <span class="string"><span class="delimiter">&quot;</span><span class="content">Import blog posts</span><span class="delimiter">&quot;</span></span>
+task <span class="symbol">:import_posts</span>, <span class="symbol">:dbfile</span> <span class="keyword">do</span> |t,args|
+  require <span class="string"><span class="delimiter">'</span><span class="content">active_record</span><span class="delimiter">'</span></span>
+
+  <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>.establish_connection(
+    <span class="symbol">:adapter</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">sqlite3</span><span class="delimiter">'</span></span>,
+    <span class="symbol">:dbfile</span> =&gt; args.dbfile
+  )
+
+  <span class="keyword">class</span> <span class="class">Content</span> &lt; <span class="constant">ActiveRecord</span>::<span class="constant">Base</span>; <span class="keyword">end</span>
+  <span class="keyword">class</span> <span class="class">Page</span> &lt; <span class="constant">Content</span>; <span class="keyword">end</span>
+  <span class="keyword">class</span> <span class="class">Article</span> &lt; <span class="constant">Content</span>; <span class="keyword">end</span>
+
+  <span class="constant">Article</span>.find(<span class="symbol">:all</span>, <span class="symbol">:conditions</span> =&gt; { <span class="symbol">:published</span> =&gt; <span class="predefined-constant">true</span> }).each <span class="keyword">do</span> |post|
+    published_at = post.published_at
+
+    page = ::<span class="constant">Webby</span>::<span class="constant">Resources</span>.basename(post.title).to_url
+    title = post.title
+    dir = <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span><span class="constant">Webby</span>.site.blog_dir<span class="inline-delimiter">}</span></span><span class="content">/</span><span class="inline"><span class="inline-delimiter">#{</span>published_at.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y/%m/%d</span><span class="delimiter">'</span></span>)<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+
+    ::<span class="constant">Webby</span>.site.args = <span class="constant">OpenStruct</span>.new(<span class="symbol">:raw</span> =&gt; [title], <span class="symbol">:page</span> =&gt; page, <span class="symbol">:title</span> =&gt; title, <span class="symbol">:dir</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="delimiter">'</span></span>)
+
+    year = published_at.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y</span><span class="delimiter">'</span></span>)
+    month = published_at.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%m</span><span class="delimiter">'</span></span>)
+
+    <span class="constant">Rake</span>::<span class="constant">Task</span>[<span class="string"><span class="delimiter">'</span><span class="content">blog:create_year_index</span><span class="delimiter">'</span></span>].execute(<span class="constant">Rake</span>::<span class="constant">TaskArguments</span>.new([<span class="symbol">:year</span>], [year]))
+    <span class="constant">Rake</span>::<span class="constant">Task</span>[<span class="string"><span class="delimiter">'</span><span class="content">blog:create_month_index</span><span class="delimiter">'</span></span>].execute(<span class="constant">Rake</span>::<span class="constant">TaskArguments</span>.new([<span class="symbol">:year</span>, <span class="symbol">:month</span>], [year, month]))
+
+    page = <span class="constant">File</span>.join(dir, <span class="constant">File</span>.basename(page))
+
+    <span class="comment"># Colons in the title isn't correct YAML</span>
+    title = <span class="string"><span class="delimiter">&quot;</span><span class="char">\&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>title<span class="inline-delimiter">}</span></span><span class="char">\&quot;</span><span class="delimiter">&quot;</span></span> <span class="keyword">if</span> title =~ <span class="regexp"><span class="delimiter">/</span><span class="content">:</span><span class="delimiter">/</span></span>
+
+    body = post.body
+
+    <span class="comment"># Convert the Ultraviolet textfilter blocks</span>
+    body.gsub!(<span class="regexp"><span class="delimiter">/</span><span class="content">&lt;typo:ultraviolet(.*?)&gt;</span><span class="delimiter">/</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">&lt;%% uv</span><span class="content">\1</span><span class="content"> do -%&gt;</span><span class="delimiter">'</span></span>)
+    body.gsub!(<span class="string"><span class="delimiter">'</span><span class="content">&lt;/typo:ultraviolet&gt;</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">&lt;%% end -%&gt;</span><span class="delimiter">'</span></span>)
+    body.gsub!(<span class="regexp"><span class="delimiter">/</span><span class="content">&lt;%% uv (.*) do -%&gt;</span><span class="delimiter">/</span></span>) <span class="keyword">do</span>
+      s = <span class="global-variable">$1</span>.split(<span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="delimiter">'</span></span>).map {|i| i.gsub(<span class="regexp"><span class="delimiter">/</span><span class="content">(.*)=&quot;(.*)[</span><span class="delimiter">/</span></span>) { ](<span class="comment">#$1) =&gt; '#$2'&quot; }}.join(', ')</span>
+      s.sub!(<span class="string"><span class="delimiter">'</span><span class="content">linenumber</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">line_numbers</span><span class="delimiter">'</span></span>)
+      <span class="string"><span class="delimiter">&quot;</span><span class="content">&lt;%% uv </span><span class="inline"><span class="inline-delimiter">#{</span>s<span class="inline-delimiter">}</span></span><span class="content"> do -%&gt;</span><span class="delimiter">&quot;</span></span>
+    <span class="keyword">end</span>
+
+    <span class="comment"># Remove extra carriage returns from the SQLite3 string.</span>
+    body.gsub!(<span class="string"><span class="delimiter">&quot;</span><span class="char">\r</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">'</span><span class="delimiter">'</span></span>)
+
+    <span class="constant">Webby</span>::<span class="constant">Builder</span>.create(page,
+                          <span class="symbol">:from</span> =&gt; <span class="constant">File</span>.join(<span class="constant">Webby</span>.site.template_dir, <span class="string"><span class="delimiter">'</span><span class="content">blog</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">post.erb</span><span class="delimiter">'</span></span>),
+                          <span class="symbol">:locals</span> =&gt; {
+                             <span class="symbol">:title</span> =&gt; title,
+                             <span class="symbol">:directory</span> =&gt; dir,
+                             <span class="symbol">:body</span> =&gt; body,
+                             <span class="symbol">:created_at</span> =&gt; published_at.to_y })
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>You&rsquo;ll have to of course add the <code>&lt;%= body %&gt;</code> tag in <code>post.erb</code>.</p>
+
+<p>Adding arguments to the year and month indices isn&rsquo;t too complicated. At the same time, I disabled the dirty flag for the indices created by the imported posts, as they don&rsquo;t need to be re-rendered more than once.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+</pre></td>
+  <td class="code"><pre>task <span class="symbol">:create_year_index</span>, <span class="symbol">:year</span> <span class="keyword">do</span> |t,args|
+  args.with_defaults(<span class="symbol">:year</span> =&gt; <span class="constant">Time</span>.now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y</span><span class="delimiter">'</span></span>))
+  year = args.year
+
+  <span class="comment"># ... snip ...</span>
+
+  <span class="constant">Webby</span>::<span class="constant">Builder</span>.create(fn, <span class="symbol">:from</span> =&gt; tmpl,
+        <span class="symbol">:locals</span> =&gt; {<span class="symbol">:title</span> =&gt; year, <span class="symbol">:directory</span> =&gt; dir, <span class="symbol">:dirty</span> =&gt; (year == <span class="constant">Time</span>.now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y</span><span class="delimiter">'</span></span>))})
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+</pre></td>
+  <td class="code"><pre>task <span class="symbol">:create_month_index</span>, <span class="symbol">:year</span>, <span class="symbol">:month</span> <span class="keyword">do</span> |t,args|
+  args.with_defaults(<span class="symbol">:year</span> =&gt; <span class="constant">Time</span>.now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y</span><span class="delimiter">'</span></span>), <span class="symbol">:month</span> =&gt; <span class="constant">Time</span>.now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%m</span><span class="delimiter">'</span></span>))
+  year = args.year
+  month = args.month
+
+  <span class="comment"># ... snip ...</span>
+
+  <span class="constant">Webby</span>::<span class="constant">Builder</span>.create(fn, <span class="symbol">:from</span> =&gt; tmpl,
+        <span class="symbol">:locals</span> =&gt; {<span class="symbol">:title</span> =&gt; month, <span class="symbol">:directory</span> =&gt; dir, <span class="symbol">:dirty</span> =&gt; (<span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>year<span class="inline-delimiter">}</span></span><span class="content">.</span><span class="inline"><span class="inline-delimiter">#{</span>month<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span> == <span class="constant">Time</span>.now.strftime(<span class="string"><span class="delimiter">'</span><span class="content">%Y.%m</span><span class="delimiter">'</span></span>))})
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>The <code>month.erb</code> and <code>year.erb</code> templates also need to be changed to support disabling the dirty flag:</p>
+
+<div class="language-erb highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+</pre></td>
+  <td class="code"><pre><span class="inline"><span class="inline-delimiter">&lt;%</span> uv <span class="symbol">:lang</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">ruby</span><span class="delimiter">'</span></span> <span class="keyword">do</span> <span class="inline-delimiter">-%&gt;</span></span>
+title:      <span class="inline"><span class="inline-delimiter">&lt;%=</span> title <span class="inline-delimiter">%&gt;</span></span>
+created_at: <span class="inline"><span class="inline-delimiter">&lt;%=</span> <span class="constant">Time</span>.now.to_y <span class="inline-delimiter">%&gt;</span></span>
+filter:     erb
+<span class="inline"><span class="inline-delimiter">&lt;%=</span> <span class="string"><span class="delimiter">'</span><span class="content">dirty:      true</span><span class="delimiter">'</span></span> <span class="keyword">if</span> dirty <span class="inline-delimiter">%&gt;</span></span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>Finally, running <code>webby blog:import_posts[typo.db]</code> finishes the import process, populating the <code>content</code> directory with all of the Typo posts.</p>
+
+<p><strong>Edit (2009.04.20):</strong> Although this blog post is still technically correct, it&rsquo;s probably better just to grab the latest versions of my tasks and templates from <a href="http://github.com/kejadlen/the_alpha_newswire/tree/master">my github repo</a>. I&rsquo;ve cleaned up the tasks a bit and added arguments to the <code>blog:post</code> task to specify the date.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2010 / 01 / 04
+        
+          /
+          <a href="/blog/2010/01/04/rolling-dice-from-the-command-line.html">rolling-dice-from-the-command-line</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Rolling dice from the command line</h2>
+        <div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+</pre></td>
+  <td class="code"><pre>puts eval(<span class="predefined-constant">ARGV</span>.join.gsub(<span class="regexp"><span class="delimiter">/</span><span class="content">(</span><span class="char">\d</span><span class="content">+)d(</span><span class="char">\d</span><span class="content">+)</span><span class="delimiter">/</span></span>) {|s|
+  rolls = <span class="global-variable">$1</span>.to_i.times.map { rand(<span class="global-variable">$2</span>.to_i) + <span class="integer">1</span> }
+  sum = rolls.inject {|n,i| n + i }
+  puts <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>s<span class="inline-delimiter">}</span></span><span class="char">\t</span><span class="inline"><span class="inline-delimiter">#{</span>sum<span class="inline-delimiter">}</span></span><span class="char">\t</span><span class="inline"><span class="inline-delimiter">#{</span>rolls.join(<span class="string"><span class="delimiter">'</span><span class="content">, </span><span class="delimiter">'</span></span>)<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+  sum
+})
+</pre></td>
+</tr></table>
+</div>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+</pre></td>
+  <td class="code"><pre>$ ./roll 2d6 + 3d4
+2d6    7    2, 5
+3d4    11   3, 4, 4
+18
+$ ./roll 2d6 + 3d4
+2d6    5    4, 1
+3d4    6    3, 1, 2
+11
+$ ./roll 2d6 + 3d4
+2d6    5    4, 1
+3d4    9    4, 2, 3
+14
+</pre></td>
+</tr></table>
+</div>
+
+      </article>
+    </main>
+  </body>
+</html>

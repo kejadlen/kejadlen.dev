@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2008 / 10 / 02
+        
+          /
+          <a href="/blog/2008/10/02/mozilla-weave-on-ubuntu-using-lighttpd.html">mozilla-weave-on-ubuntu-using-lighttpd</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Mozilla Weave on Ubuntu using lighttpd</h2>
+        <h2 id="kind-article">kind: article</h2>
+<p>Now that I got a Lenovo X200, decided to use Mozilla Weave to sync Firefox 3 across all my computers. In short, this involves getting WebDAV and mod_auth working on lighttpd.</p>
+
+<h3 id="enabling-webdav-and-modauth-on-ubuntu">Enabling WebDAV and mod_auth on Ubuntu</h3>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+</pre></td>
+  <td class="code"><pre>$ lighty-enable-mod
+$ sudo apt-get install lighttpd-mod-webdav
+</pre></td>
+</tr></table>
+</div>
+
+<div class="language-conf highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+</pre></td>
+  <td class="code"><pre>server.modules = (
+  ...
+  &quot;mod_webdav&quot;,
+  ...
+)
+
+$HTTP[&quot;host&quot;] =~ &quot;weave.foo.com&quot; {
+  server.document-root = &quot;/foo/weave&quot;
+  accesslog.filename = &quot;/var/log/lighttpd/weave/access.log&quot;
+  webdav.activate = &quot;enable&quot;
+  webdav.is-readonly = &quot;disable&quot;
+  webdav.sqlite-db-name = &quot;/var/run/lighttpd/lighttpd.webdav_lock.db&quot;
+  auth.backend = &quot;htpasswd&quot;
+  auth.backend.htpasswd.userfile = &quot;/foo/weave/passwd.dav&quot;
+  auth.require = ( &quot;&quot; =&gt; ( &quot;method&quot; =&gt; &quot;basic&quot;,
+                           &quot;realm&quot; =&gt; &quot;webdav&quot;,
+                           &quot;require&quot; =&gt; &quot;valid-user&quot; ) )
+}
+</pre></td>
+</tr></table>
+</div>
+
+<h3 id="generating-the-htpasswd-file-and-fixing-permissions">Generating the htpasswd file and fixing permissions</h3>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+</pre></td>
+  <td class="code"><pre>$ sudo apt-get install apache2-utils
+
+$ sudo chown www-data:www-data /foo/weave
+$ sudo -u www-data htpasswd -c /foo/weave/passwd.dav [username]
+$ sudo -u www-data chmod 600 passwd.dav
+</pre></td>
+</tr></table>
+</div>
+
+<p>Lastly, the latest Weave bits can be downloaded <a href="http://people.mozilla.com/~cbeard/weave/dist/latest-weave.xpi">here</a>. It takes a couple tries to get it working, but you’ll need to fix the server in preferences and then sign in using the created user:pass in the passwd.dav file.</p>
+
+      </article>
+    </main>
+  </body>
+</html>
