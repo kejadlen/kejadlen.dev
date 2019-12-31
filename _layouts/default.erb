@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <%
+          dir, file = File.split(page.clean_url)
+          segments = dir.split(?/)
+          segments << "" if segments.empty? # yuck
+          urls = segments.inject([]) {|urls, segment| urls << { segment: segment, url: File.join(?/, segment, "index.html") } }
+        %>
+        /
+        <%=
+          urls.map {|h|
+            segment, url = h.fetch_values(:segment, :url)
+            if p = site.pages_by_url[url]
+              p.link_html
+            else
+              segment
+            end
+          }.join(" / ")
+        %>
+        <% if page.parent %>
+          /
+          <%= page.link_html(file.sub(/\..*$/, "")) %>
+        <% end %>
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2><%= page.title %></h2>
+        <%= content %>
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+---
+title: blog
+...
+
+<ul>
+<% page.all_subpages_by_level.each do |_, page| %>
+  <li><%= page.date.strftime("%Y-%m-%d") %> <%= page.link_html %></li>
+<% end %>
+</ul>
