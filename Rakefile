@@ -48,15 +48,10 @@ task :run do
   runner.join
 end
 
-# desc "Push .site to kejadlen/kejadlen.dev#gh-pages"
-# task :push do
-#   remote = `git remote show origin | awk '/Push  URL/ {print $3}'`.strip
-#   chdir ".site" do
-#     sh "git init"
-#     sh "git remote add origin #{remote}"
-#     sh "git fetch"
-#   end
-# end
+desc "Push"
+task :push do
+  sh "git subtree push --prefix=.site gh-pages"
+end
 
 require "crosswords"
 
@@ -101,4 +96,10 @@ namespace :sync do
       File.write(t.name, JSON.dump(data))
     end
   end
+end
+
+desc "Setup"
+task :setup do
+  sh "git remote add --track gh-pages gh-pages git@github.com:kejadlen/kejadlen.dev.git"
+  sh "git subtree add --prefix .site --squash gh-pages gh-pages"
 end
