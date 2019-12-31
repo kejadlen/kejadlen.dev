@@ -17,14 +17,18 @@ site = FileList["#{config.src}/**/*"]
   .include("#{config.src}/**/.*") # include dotfiles
   .map {|input| [input.pathmap("%{#{config.src},#{config.out}}p"), input] }
   .to_h
+CLEAN.include(site.keys)
 task default: site.keys
 
 site.each do |output, input|
   file output => input do
     cp input, output
   end
-  CLEAN.include(output)
 end
+
+#
+# Meta
+#
 
 desc "Serve"
 task :serve do
