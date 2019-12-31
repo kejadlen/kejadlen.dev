@@ -1,22 +1,22 @@
 require "rake/clean"
 
 class Config
-  attr_reader *%i[ src out exts ]
+  attr_reader *%i[ src out layouts exts ]
 
-  def initialize(src:, out:, exts:)
-    @src, @out, @exts = src, out, exts.transform_keys(&:to_s)
+  def initialize(src: "src", out: "out", layouts: "_layouts", exts: {})
+    @src, @out = src, out
+    @layouts = [ layouts, File.join(src, layouts) ].find {|d| File.directory?(d) }
+    @exts = exts.transform_keys(&:to_s)
   end
 end
 
 config = Config.new(
-  src: "src",
-  out: "out",
   exts: {
     md: ->(content) {
       require "kramdown"
       require "kramdown-parser-gfm"
       Kramdown::Document.new(content, input: "GFM").to_html
-    }
+    },
   }
 )
 
@@ -28,6 +28,7 @@ task default: config.out
 
 inputs = FileList["#{config.src}/**/*"]
   .include("#{config.src}/**/.*") # include dotfiles
+  .exclude(config.layouts, "#{config.layouts}/**/*")
 
 inputs.each do |input|
   segments = input.split(?.)
@@ -37,11 +38,17 @@ inputs.each do |input|
   end
 
   output = segments.join(?.).sub(/^#{config.src}/, config.out)
-  file output => input do
+  file output => FileList[input, "#{config.layouts}/default.erb"] do
     content = File.read(input)
     exts.map {|ext| config.exts.fetch(ext) }.each do |ext|
       content = ext.(content)
     end
+
+    %w[ default.erb ].map {|l| File.read(File.join(config.layouts, l)) }.each do |layout|
+      require "erb"
+      content = ERB.new(layout).result_with_hash(content: content)
+    end
+
     File.write(output, content)
   end
   CLOBBER.include(output)
