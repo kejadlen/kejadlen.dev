@@ -1,11 +1,24 @@
 require "rake/clean"
 
-Config = Struct.new(*%i[ src out ], keyword_init: true)
+class Config
+  attr_reader *%i[ src out exts ]
 
-config = Config.new({
+  def initialize(src:, out:, exts:)
+    @src, @out, @exts = src, out, exts.transform_keys(&:to_s)
+  end
+end
+
+config = Config.new(
   src: "src",
   out: "out",
-})
+  exts: {
+    md: ->(content) {
+      require "kramdown"
+      require "kramdown-parser-gfm"
+      Kramdown::Document.new(content, input: "GFM").to_html
+    }
+  }
+)
 
 include FileUtils::Verbose
 
@@ -13,17 +26,26 @@ directory config.out
 CLEAN.include(config.out)
 task default: config.out
 
-site = FileList["#{config.src}/**/*"]
+inputs = FileList["#{config.src}/**/*"]
   .include("#{config.src}/**/.*") # include dotfiles
-  .map {|input| [input.pathmap("%{#{config.src},#{config.out}}p"), input] }
-  .to_h
-CLEAN.include(site.keys)
-task default: site.keys
 
-site.each do |output, input|
-  file output => input do
-    cp input, output
+inputs.each do |input|
+  segments = input.split(?.)
+  exts = []
+  while config.exts.keys.include?(segments.last)
+    exts << segments.pop
   end
+
+  output = segments.join(?.).sub(/^#{config.src}/, config.out)
+  file output => input do
+    content = File.read(input)
+    exts.map {|ext| config.exts.fetch(ext) }.each do |ext|
+      content = ext.(content)
+    end
+    File.write(output, content)
+  end
+  CLOBBER.include(output)
+  task default: output
 end
 
 #
@@ -43,7 +65,7 @@ task :serve do
     server.start
   end
 
-  options = Rerun::Options.parse(args: %w[ rake --exit ])
+  options = Rerun::Options.parse(args: %w[ --pattern {Gemfile,Gemfile.lock,Rakefile,src/**/*} --exit rake ])
   cmd = options.delete(:cmd)
   runner = Thread.new do
     Rerun::Runner.keep_running(cmd, options)
