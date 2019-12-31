@@ -48,10 +48,15 @@ task :run do
   runner.join
 end
 
-desc "Push .site to kejadlen/kejadlen.dev#gh-pages"
-task :push do
-
-end
+# desc "Push .site to kejadlen/kejadlen.dev#gh-pages"
+# task :push do
+#   remote = `git remote show origin | awk '/Push  URL/ {print $3}'`.strip
+#   chdir ".site" do
+#     sh "git init"
+#     sh "git remote add origin #{remote}"
+#     sh "git fetch"
+#   end
+# end
 
 require "crosswords"
 
