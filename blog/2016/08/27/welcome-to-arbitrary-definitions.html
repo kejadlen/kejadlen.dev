@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2016 / 08 / 27
+        
+          /
+          <a href="/blog/2016/08/27/welcome-to-arbitrary-definitions.html">welcome-to-arbitrary-definitions</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Welcome to Arbitrary Definitions!</h2>
+        <p>It&rsquo;s been a while since I&rsquo;ve had a website, so I buckled down this past week
+and threw <a href="https://github.com/kejadlen/kejadlen.github.io">this</a> together.</p>
+
+<p><a href="https://pages.github.com/">GitHub Pages</a> was an obvious choice for the backend, seeing as how it&rsquo;s a)
+free and b) simple (for me, at least). While I used <a href="http://nanoc.ws/">nanoc</a> for building <a href="https://github.com/kejadlen/kejadlen.net">my
+previous blog</a>, I decided to go down the path of least resistance
+this time and use <a href="https://jekyllrb.com/docs/github-pages/">Jekyll with github-pages</a>.</p>
+
+<p>Despite mostly going with the flow on infrastructure, I can&rsquo;t help do some
+things my own way. Last time, I went with <a href="http://foundation.zurb.com/">Zurb Foundation</a> over <a href="http://getbootstrap.com/">Bootstrap</a>
+(for really no good reason other than I like trying out less-popular options).
+This time, I&rsquo;m attempting to build mostly from-scratch on top of a few
+lighter-weight libraries: <a href="https://necolas.github.io/normalize.css/">normalize.css</a>, <a href="http://bourbon.io/">Bourbon</a>, and <a href="http://neat.bourbon.io/">Neat</a>.</p>
+
+<p>Since I&rsquo;m no designer, I&rsquo;m leaning on <a href="http://ethanschoonover.com/">Ethan Schoonover</a>&rsquo;s <a href="http://ethanschoonover.com/solarized">Solarized</a> and
+taking some inspiration from <a href="https://edwardtufte.github.io/tufte-css/">Tufte CSS</a> for the design. But mostly, I&rsquo;m just
+trying to avoid shooting myself in the foot in this area by keeping it simple.</p>
+
+<h2 id="so-is-there-anything-interesting-about-how-this-blog-is-built">So is there anything interesting about how this blog is built?</h2>
+
+<p>Are you looking for something a little out of the ordinary? Well, I suppose
+that how I&rsquo;m doing dependency management for the CSS libraries is not normal.
+Instead of downloading the files directly or using a binary delivered via
+a dependency manager to install and update the library (which is a pet peeve of
+mine, but I&rsquo;ll leave that rant for a future post), I&rsquo;ve <a href="https://github.com/kejadlen/kejadlen.github.io/tree/master/vendor">vendored</a> the
+dependencies using <a href="https://git-scm.com/docs/git-submodule"><code>git</code> submodules</a> and <a href="https://en.wikipedia.org/wiki/Symbolic_link#POSIX_and_Unix-like_operating_systems">symlinked</a>
+the libraries into the <a href="https://github.com/kejadlen/kejadlen.github.io/tree/master/_sass"><code>_sass</code> directory</a>.</p>
+
+<p>This might seem like overkill, but I don&rsquo;t want to introduce additional tooling
+unless absolutely necessary and as already mentioned, I hate installing tools
+via dependency managers. Submodules make updating from upstream trivial (<code>git
+submodule update --recursive</code>) and symlinks mean that if I need to make my own
+changes (which shouldn&rsquo;t be necessary for this project), I don&rsquo;t need to jump
+through hoops and can just update the files directly and then commit/push from
+the submodule.</p>
+
+<p>Although many people seem to shy away from <code>git</code> submodules, I find that it&rsquo;s
+a powerful tool that I turn to surprisingly often. While it is easy to really
+screw yourself over, a few ground rules and discipline make it quite rare.
+Admittedly, <code>git</code> is a tool that I&rsquo;ve sharpened over the years, so I&rsquo;m quite
+comfortable with it&rsquo;s edges, but it&rsquo;s a tool that&rsquo;s well worth honing.</p>
+
+
+      </article>
+    </main>
+  </body>
+</html>

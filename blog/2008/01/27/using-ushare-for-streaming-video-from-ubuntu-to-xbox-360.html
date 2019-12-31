@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2008 / 01 / 27
+        
+          /
+          <a href="/blog/2008/01/27/using-ushare-for-streaming-video-from-ubuntu-to-xbox-360.html">using-ushare-for-streaming-video-from-ubuntu-to-xbox-360</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Using uShare to stream video from Ubuntu to an Xbox 360</h2>
+        <p>With much thanks to <a href="http://www.virtual-sushi.co.uk/blog/how-to-stream-videos-from-ubuntu-to-xbox360-with-ushare/">this blog post</a>, which reveals how to fix <code>/etc/ushare.conf</code> and <code>/etc/init.d/ushare</code>.</p>
+
+<p>Install the dependencies:</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+</pre></td>
+  <td class="code"><pre>$ sudo apt-get install libupnp-dev pkg-config
+$ sudo echo &quot;deb http://www.geexbox.org/debian/ unstable main&quot; &gt;&gt; /etc/apt/sources.list
+$ sudo apt-get install libdlna-dev ushare
+</pre></td>
+</tr></table>
+</div>
+
+<p>(uShare’s being installed here just to grab the conf files.)</p>
+
+<p>Pick up the latest version of uShare (assuming Mercurial is installed):</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+</pre></td>
+  <td class="code"><pre>$ hg clone http://hg.geexbox.org/ushare
+</pre></td>
+</tr></table>
+</div>
+
+<p>In the uShare directory:</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+</pre></td>
+  <td class="code"><pre>$ ./configure --prefix=/usr/local
+$ make
+$ sudo make install
+</pre></td>
+</tr></table>
+</div>
+
+<p>Now the configuration files need to be edited. Make the appropriate changes to <code>/etc/ushare.conf</code>, making sure to modify <code>ENABLE_XBOX</code> to <code>USHARE_ENABLE_XBOX</code>. The rest should be self-explanatory.</p>
+
+<p>In <code>/etc/init.d/ushare</code>, add <code>USHARE_OPTIONS="-f $CONFIGFILE"</code> so that the correct command line is sent to uShare.</p>
+
+<p>And now you should be able to stream videos from your Ubuntu fileserver to your Xbox 360.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

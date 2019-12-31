@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2007 / 02 / 24
+        
+          /
+          <a href="/blog/2007/02/24/pbpaste-and-pbcopy-in-windows.html">pbpaste-and-pbcopy-in-windows</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>pbpaste and pbcopy in Windows</h2>
+        <p>Indeed, it is true. And as an added bonus, you also get a snippet of my <code>.bash_profile</code> in Cygwin.</p>
+
+<h3 id="pbcopycmd">pbcopy.cmd</h3>
+
+<pre><code>@ruby "c:/Documents and Settings/alphach.redmond/bin/pbcopy.rb"
+</code></pre>
+
+<h3 id="pbcopyrb">pbcopy.rb</h3>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+</pre></td>
+  <td class="code"><pre><span class="doctype">#!/usr/bin/env ruby</span>
+
+require <span class="string"><span class="delimiter">'</span><span class="content">win32/clipboard</span><span class="delimiter">'</span></span>
+
+<span class="constant">Win32</span>::<span class="constant">Clipboard</span>.set_data(<span class="predefined-constant">ARGF</span>.read)
+</pre></td>
+</tr></table>
+</div>
+
+<h3 id="pbpastecmd">pbpaste.cmd</h3>
+
+<pre><code>@ruby "c:/Documents and Settings/alphach.redmond/bin/pbpaste.rb"
+</code></pre>
+
+<h3 id="pbpasterb">pbpaste.rb</h3>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+</pre></td>
+  <td class="code"><pre><span class="doctype">#!/usr/bin/env ruby</span>
+
+require <span class="string"><span class="delimiter">'</span><span class="content">win32/clipboard</span><span class="delimiter">'</span></span>
+
+puts <span class="constant">Win32</span>::<span class="constant">Clipboard</span>.data
+</pre></td>
+</tr></table>
+</div>
+
+<h3 id="bashprofile">.bash_profile</h3>
+
+<div class="language-bash highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+</pre></td>
+  <td class="code"><pre>if $cygwin; then
+  alias pbpaste=/home/alphach/bin/pbpaste.cmd
+  alias pbcopy=/home/alphach/bin/pbcopy.cmd
+fi
+</pre></td>
+</tr></table>
+</div>
+
+<p>This aliasing is a hack to properly use pbpaste without calling pbpaste.cmd. Basically, being able to write <code>pbpaste &gt; temp.txt</code> instead of <code>pbpaste.cmd &gt; temp.txt</code>. Currently, Cygwin’s automatic command aliasing isn’t working quite right. I’m going to look into it when I have the time.</p>
+
+<p><strong>Edit</strong>: I later discovered that <code>getclip</code> and <code>putclip</code> accomplish the same thing in Cygwin, so I can just alias <code>pbcopy</code> and <code>pbpaste</code> to those commands! No need for all this hassle.</p>
+
+      </article>
+    </main>
+  </body>
+</html>

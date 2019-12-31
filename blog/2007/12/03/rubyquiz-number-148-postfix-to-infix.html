@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2007 / 12 / 03
+        
+          /
+          <a href="/blog/2007/12/03/rubyquiz-number-148-postfix-to-infix.html">rubyquiz-number-148-postfix-to-infix</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>RubyQuiz #148: Postfix to Infix</h2>
+        <p>My extremely lazy whack at the latest Ruby Quiz. Turns a postfix expression into an infix expression via regular expressions.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+</pre></td>
+  <td class="code"><pre>str = <span class="predefined-constant">ARGV</span>[<span class="integer">0</span>].split(<span class="regexp"><span class="delimiter">/</span><span class="char">\s</span><span class="content">+</span><span class="delimiter">/</span></span>).join(<span class="string"><span class="delimiter">'</span><span class="content">_</span><span class="delimiter">'</span></span>)
+
+<span class="keyword">while</span> str.include?(<span class="string"><span class="delimiter">'</span><span class="content">_</span><span class="delimiter">'</span></span>)
+  str.sub!(<span class="regexp"><span class="delimiter">/</span><span class="content">([^_]+)_([^_]+)_([+</span><span class="char">\-</span><span class="content">*</span><span class="char">\/</span><span class="content">])</span><span class="delimiter">/</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">(</span><span class="content">\1</span><span class="content"> </span><span class="content">\3</span><span class="content"> </span><span class="content">\2</span><span class="content">)</span><span class="delimiter">'</span></span>)
+<span class="keyword">end</span>
+
+puts str
+</pre></td>
+</tr></table>
+</div>
+
+<p>A few test cases I used in developing the solution before turning it into an actual script:</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+<a href="#n19" name="n19">19</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">test/unit</span><span class="delimiter">'</span></span>
+
+<span class="keyword">def</span> <span class="function">postfix_to_infix</span>(str)
+  str = str.split(<span class="regexp"><span class="delimiter">/</span><span class="content">[^.</span><span class="char">\d</span><span class="content">+</span><span class="char">\-</span><span class="content">*</span><span class="char">\/</span><span class="content">]</span><span class="delimiter">/</span></span>).join(<span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="delimiter">'</span></span>)
+  <span class="keyword">while</span> str !~ <span class="regexp"><span class="delimiter">/</span><span class="content">^</span><span class="char">\(</span><span class="content">.*</span><span class="char">\)</span><span class="content">$</span><span class="delimiter">/</span></span>
+    str.sub!(<span class="regexp"><span class="delimiter">/</span><span class="content">([^ ]+) ([^ ]+) ([+</span><span class="char">\-</span><span class="content">*</span><span class="char">\/</span><span class="content">])</span><span class="delimiter">/</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">(</span><span class="content">\1</span><span class="content">\3</span><span class="content">\2</span><span class="content">)</span><span class="delimiter">'</span></span>)
+  <span class="keyword">end</span>
+  str.gsub(<span class="regexp"><span class="delimiter">/</span><span class="content">([+</span><span class="char">\-</span><span class="content">*</span><span class="char">\/</span><span class="content">])</span><span class="delimiter">/</span></span>, <span class="string"><span class="delimiter">'</span><span class="content"> </span><span class="content">\1</span><span class="content"> </span><span class="delimiter">'</span></span>).sub(<span class="regexp"><span class="delimiter">/</span><span class="content">^</span><span class="char">\(</span><span class="content">(.*)</span><span class="char">\)</span><span class="content">$</span><span class="delimiter">/</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">\1</span><span class="delimiter">'</span></span>)
+<span class="keyword">end</span>
+
+<span class="keyword">class</span> <span class="class">PostfixToInfixTest</span> &lt; <span class="constant">Test</span>::<span class="constant">Unit</span>::<span class="constant">TestCase</span>
+  <span class="keyword">def</span> <span class="function">test_postfix_to_infix</span>
+    assert_equal <span class="string"><span class="delimiter">'</span><span class="content">2 + 3</span><span class="delimiter">'</span></span>, postfix_to_infix(<span class="string"><span class="delimiter">'</span><span class="content">2 3 +</span><span class="delimiter">'</span></span>)
+    assert_equal <span class="string"><span class="delimiter">'</span><span class="content">12 + 34</span><span class="delimiter">'</span></span>, postfix_to_infix(<span class="string"><span class="delimiter">'</span><span class="content">12 34 +</span><span class="delimiter">'</span></span>)
+    assert_equal <span class="string"><span class="delimiter">'</span><span class="content">1.2 + 3.4</span><span class="delimiter">'</span></span>, postfix_to_infix(<span class="string"><span class="delimiter">'</span><span class="content">1.2 3.4 +</span><span class="delimiter">'</span></span>)
+    assert_equal <span class="string"><span class="delimiter">'</span><span class="content">(1 - 2) - (3 + 4)</span><span class="delimiter">'</span></span>, postfix_to_infix(<span class="string"><span class="delimiter">'</span><span class="content">1 2 - 3 4 + -</span><span class="delimiter">'</span></span>)
+    assert_equal <span class="string"><span class="delimiter">'</span><span class="content">(56 * (34 + 213.7)) - 678</span><span class="delimiter">'</span></span>, postfix_to_infix(<span class="string"><span class="delimiter">'</span><span class="content">56 34 213.7 + * 678 -</span><span class="delimiter">'</span></span>)
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+      </article>
+    </main>
+  </body>
+</html>

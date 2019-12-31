@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2017 / 07 / 06
+        
+          /
+          <a href="/blog/2017/07/06/encrypting-stuff-in-git.html">encrypting-stuff-in-git</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Encrypting Stuff in Git</h2>
+        <p><strong>Disclaimer:</strong> <em>You probably don&rsquo;t want to use this technique for real
+secrets/projects, for a variety of reasons. If you don&rsquo;t know what you&rsquo;re
+doing, you should avoid doing this.</em></p>
+
+<p>With that being said, sometimes you just want to store an encrypted file in git
+without jumping through a lot of hoops.</p>
+
+<p>We begin by adding an <code>encrypt</code> filter in git. This assumes that <code>openssl</code> is
+installed and that the encryption password is in an environment variable named
+<code>ENC_PWD</code>. (I personally use <a href="https://direnv.net/">direnv</a> to manage the latter, with
+<code>.envrc</code> in my global <code>.gitignore</code> file.)</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+</pre></td>
+  <td class="code"><pre>$ git config filter.encrypt.clean &quot;openssl aes-256-cbc -S '' -pass env:ENC_PWD&quot;'
+$ git config filter.encrypt.smudge &quot;openssl aes-256-cbc -d -S '' -pass env:ENC_PWD&quot;'
+</pre></td>
+</tr></table>
+</div>
+
+<p>This sets up <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes">clean/smudge</a> filters so that files will live
+decrypted on the filesystem, but will be encrypted in git itself. This is
+automatically done by git, so there are no extra steps in the git workflow.</p>
+
+<p>Once this is done, you&rsquo;ll need to specify what files to encrypt in the
+<code>.gitattributes</code> file:</p>
+
+<pre><code>secrets.txt filter=encrypt
+</code></pre>
+
+<p>And that&rsquo;s it!</p>
+
+<p>Actually pretty straightforward, but this doesn&rsquo;t come without some
+disadvantages:</p>
+
+<ul>
+  <li>Most people have no idea about git&rsquo;s clean/smudge filters, and it&rsquo;s
+non-obvious for even experienced git users to tell that the secrets are
+actually encrypted inside of git. If anything goes wrong, most people are
+going to be extremely confused.</li>
+  <li>Cloning a new repo without having the encrypt filter config will result in
+the secrets file not being decrypted (since how would git even know to do
+so?). IIRC, git doesn&rsquo;t even warn about the filter not existing. And then
+getting git to decrypt the file after installing the filter requires poking
+git /just so/ to get it to reset the file.</li>
+</ul>
+
+<p>Once it is set up and working though, it is a pretty seamless experience.
+Updating secrets doesn&rsquo;t require any additional steps, and ditto with pulling
+down a new version.</p>
+
+
+      </article>
+    </main>
+  </body>
+</html>

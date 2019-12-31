@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2009 / 06 / 08
+        
+          /
+          <a href="/blog/2009/06/08/rotating-video-for-flickr.html">rotating-video-for-flickr</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Rotating video for Flickr</h2>
+        <p>Much thanks to these <a href="http://blech.vox.com/library/post/rotate_video_for_flickr.html">blog</a> <a href="http://www.hanselman.com/blog/HowToRotateAnAVIOrMPEGFileTakenInPortrait.aspx">posts</a> for revealing the secrets behind rotating video with mencoder. Specifically, I had taken video on my D90 which needed to be rotated into portrait.</p>
+
+<div class="language-console highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+</pre></td>
+  <td class="code"><pre>mencoder -vf rotate=3,scale=405:720 -o middle.avi -oac copy -fafmttag 1 -ovc lavc -lavcopts vcodec=mjpeg input.avi
+mencoder -vf expand=960:720 -oac copy -ovc lavc -lavcopts vcodec=mjpeg middle.avi -o output.avi
+</pre></td>
+</tr></table>
+</div>
+
+      </article>
+    </main>
+  </body>
+</html>

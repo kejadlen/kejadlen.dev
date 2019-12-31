@@ -29,14 +29,25 @@
       <nav>
         
         /
-        <a href="/">kejadlen.dev</a>
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2006 / 10 / 25
+        
+          /
+          <a href="/blog/2006/10/25/addressbar-keywords-in-ie.html">addressbar-keywords-in-ie</a>
         
       </nav>
     </header>
     <main>
       <article>
-        <h2>kejadlen.dev</h2>
-        hello world!
+        <h2>Addressbar keywords in IE</h2>
+        <p>Apparently, you can actually use keywords in IE, just like you would with
+Firefox. Except that creating them is much more of a pain. You need to go into
+the registry and add a new key under <code>HKCU/Software/Microsoft/Internet
+Explorer/SearchUrl/</code>. The name of the key will be the keyword and the default
+value the URL. Just like with Firefox, a <code>%s</code> in the URL will be replaced by
+any words following the keyword when you use it.</p>
+
+<p>Crazy.</p>
+
       </article>
     </main>
   </body>

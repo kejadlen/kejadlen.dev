@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2007 / 03 / 08
+        
+          /
+          <a href="/blog/2007/03/08/using-cmd-exe-s-start-in-cygwin.html">using-cmd-exe-s-start-in-cygwin</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Using cmd.exe's "start" in Cygwin</h2>
+        <p>So one of the niceties about OS X is the integration with the terminal. I’ve already <a href="/2007/02/24/pbpaste-and-pbcopy-in-windows">added pbcopy and pbpaste to Cygwin</a>, so I figured it was about time to get the <code>open</code> command working. Note that <code>cmd.exe</code> has a handy start command which is similar to <code>open</code> on OS X. (Not quite as nice, but hey, you take what you can get.)</p>
+
+<p>Some quick Googling revealed <a href="http://generally.wordpress.com/2006/11/10/windows-hack-open-an-explorer-from-the-command-line/">this page</a>, and voila! A <code>start</code> which allows opening explorer windows (and files associated with programs) from Cygwin.</p>
+
+<p>Just add <code>alias start="cmd /c start"</code> in the <code>if $cygwin; then block</code> of your <code>.bash_profile</code>.</p>
+
+<p>(As an aside, I really should start putting these configs under source control.)</p>
+
+      </article>
+    </main>
+  </body>
+</html>

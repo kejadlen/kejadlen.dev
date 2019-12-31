@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2008 / 11 / 14
+        
+          /
+          <a href="/blog/2008/11/14/testing-my-ultraviolet-textfilter.html">testing-my-ultraviolet-textfilter</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Testing my Ultraviolet textfilter</h2>
+        <p>A demonstration of code/syntax highlighting in Typo. To install:</p>
+
+<p>~~~ console
+$ script/plugin install git://github.com/kejadlen/typo_textfilter_ultraviolet.git
+  ```</p>
+
+<p>Some examples:</p>
+
+<div class="UltraViolet">
+<pre class="idle">class Foo
+  def bar
+    puts <span class="String"><span class="String">"</span>hello world<span class="String">"</span></span>
+  end
+end
+</pre>
+</div>
+
+<p>C with blackboard theme and line numbers:</p>
+
+<div class="UltraViolet">
+<pre class="blackboard"><span class="line-numbers">   1 </span> <span class="Storage">void</span> bar() {
+<span class="line-numbers">   2 </span>   <span class="Support">printf</span>(<span class="String"><span class="String">"</span>hello world<span class="Constant">\n</span><span class="String">"</span></span>);
+<span class="line-numbers">   3 </span> }
+</pre>
+</div>
+
+<p>Objective-C with the idle theme:</p>
+
+<div class="UltraViolet">
+<pre class="idle">#<span class="Keyword">import</span> <span class="String"><span class="String">&lt;</span>Foundation/NSObject.h<span class="String">&gt;</span></span>
+
+<span class="Storage"><span class="Storage">@</span>interface</span> <span class="TypeName">Fraction</span>: <span class="InheritedClass">NSObject</span> {
+    <span class="Storage">int</span> numerator;
+    <span class="Storage">int</span> denominator;
+}
+
+-(<span class="Storage">void</span>) <span class="FunctionName">print</span>;
+-(<span class="Storage">void</span>) <span class="FunctionName">setNumerator</span><span class="FunctionName"><span class="FunctionName">:</span></span> (<span class="Storage">int</span>) <span class="FunctionArgument">d</span>;
+-(<span class="Storage">void</span>) <span class="FunctionName">setDenominator</span><span class="FunctionName"><span class="FunctionName">:</span></span> (<span class="Storage">int</span>) <span class="FunctionArgument">d</span>;
+-(<span class="Storage">int</span>) <span class="FunctionName">numerator</span>;
+-(<span class="Storage">int</span>) <span class="FunctionName">denominator</span>;
+<span class="Storage"><span class="Storage">@</span>end</span>
+</pre>
+</div>
+
+<script type="text/javascript">
+var head = document.getElementsByTagName('head')[0];
+var link = document.createElement('link');
+link.rel = 'stylesheet';
+link.href = '/assets/{{ page.title | slugify}}/blackboard.css';
+head.appendChild(link);
+var link = document.createElement('link');
+link.rel = 'stylesheet';
+link.href = '/assets/{{ page.title | slugify}}/idle.css';
+head.appendChild(link);
+</script>
+
+
+      </article>
+    </main>
+  </body>
+</html>

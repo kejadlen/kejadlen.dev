@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="TODO">
+
+    <title>kejadlen.dev</title>
+
+    <style type="text/css">
+      /* http://bettermotherfuckingwebsite.com/ */
+      body {
+        margin: 40px auto;
+        max-width: 650px;
+        line-height: 1.6;
+        font-size: 18px;
+        color: #444;
+        padding: 0 10px;
+      }
+      h1,h2,h3 {
+        line-height: 1.2;
+      }
+      main {
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        
+        /
+        <a href="/">kejadlen.dev</a> / <a href="/blog/">blog</a> / 2008 / 01 / 02
+        
+          /
+          <a href="/blog/2008/01/02/twitter-stats-using-ruby.html">twitter-stats-using-ruby</a>
+        
+      </nav>
+    </header>
+    <main>
+      <article>
+        <h2>Twitter stats using Ruby</h2>
+        <p>I saw <a href="http://dcortesi.com/2007/12/27/twitter-stats/">Damon Cortesi’s Twitter Stats script</a> last night, and decided to make a Ruby version. This was before he released his code, so it’s reverse-engineered rather than ported. I’ll take a look later tonight to see how much the logic differs.</p>
+
+<p>Edit: This code is rather inelegant, and I’ve replaced the clunky CSV files with an Sqlite3 database. You can find the <a href="http://github.com/kejadlen/twitter_stats/tree/master">new and improved scripts here</a>. The following should still work, and I’m leaving it here for posterity’s sake.</p>
+
+<p>First up, I wrote a quick Tweet class to actually get all of my tweets.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+<a href="#n19" name="n19">19</a>
+<strong><a href="#n20" name="n20">20</a></strong>
+<a href="#n21" name="n21">21</a>
+<a href="#n22" name="n22">22</a>
+<a href="#n23" name="n23">23</a>
+<a href="#n24" name="n24">24</a>
+<a href="#n25" name="n25">25</a>
+<a href="#n26" name="n26">26</a>
+<a href="#n27" name="n27">27</a>
+<a href="#n28" name="n28">28</a>
+<a href="#n29" name="n29">29</a>
+<strong><a href="#n30" name="n30">30</a></strong>
+<a href="#n31" name="n31">31</a>
+<a href="#n32" name="n32">32</a>
+<a href="#n33" name="n33">33</a>
+<a href="#n34" name="n34">34</a>
+<a href="#n35" name="n35">35</a>
+<a href="#n36" name="n36">36</a>
+<a href="#n37" name="n37">37</a>
+<a href="#n38" name="n38">38</a>
+<a href="#n39" name="n39">39</a>
+<strong><a href="#n40" name="n40">40</a></strong>
+<a href="#n41" name="n41">41</a>
+<a href="#n42" name="n42">42</a>
+<a href="#n43" name="n43">43</a>
+<a href="#n44" name="n44">44</a>
+<a href="#n45" name="n45">45</a>
+<a href="#n46" name="n46">46</a>
+<a href="#n47" name="n47">47</a>
+<a href="#n48" name="n48">48</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">hpricot</span><span class="delimiter">'</span></span>
+require <span class="string"><span class="delimiter">'</span><span class="content">open-uri</span><span class="delimiter">'</span></span>
+
+<span class="keyword">class</span> <span class="class">Tweet</span>
+  <span class="keyword">def</span> <span class="function">initialize</span>(user)
+    <span class="instance-variable">@user_url</span> = <span class="string"><span class="delimiter">&quot;</span><span class="content">http://twitter.com/</span><span class="inline"><span class="inline-delimiter">#{</span>user<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>
+
+    <span class="instance-variable">@doc</span> = Hpricot(open(<span class="instance-variable">@user_url</span>))
+    <span class="instance-variable">@page</span> = <span class="integer">1</span>
+
+    <span class="instance-variable">@tweets</span> = [current_tweet]
+    <span class="instance-variable">@tweets</span> += page_to_tweets
+  <span class="keyword">end</span>
+
+  <span class="keyword">def</span> <span class="function">current_tweet</span>
+    tweet,time = <span class="instance-variable">@doc</span>/<span class="string"><span class="delimiter">'</span><span class="content">div.desc</span><span class="delimiter">'</span></span>/<span class="string"><span class="delimiter">'</span><span class="content">p</span><span class="delimiter">'</span></span>
+    tweet = tweet.inner_html
+    time = <span class="constant">DateTime</span>.parse(time.at(<span class="string"><span class="delimiter">'</span><span class="content">abbr</span><span class="delimiter">'</span></span>)[<span class="string"><span class="delimiter">'</span><span class="content">title</span><span class="delimiter">'</span></span>])
+
+    [tweet, time]
+  <span class="keyword">end</span>
+
+  <span class="keyword">def</span> <span class="function">page_to_tweets</span>
+    (<span class="instance-variable">@doc</span>/<span class="string"><span class="delimiter">'</span><span class="content">div.tab</span><span class="delimiter">'</span></span>/<span class="string"><span class="delimiter">'</span><span class="content">tr.hentry</span><span class="delimiter">'</span></span>).map <span class="keyword">do</span> |tweet|
+      tweet,time = tweet/<span class="string"><span class="delimiter">'</span><span class="content">span</span><span class="delimiter">'</span></span>
+      tweet = tweet.inner_html.gsub(<span class="regexp"><span class="delimiter">/</span><span class="content">^</span><span class="char">\s</span><span class="content">*(.*)</span><span class="char">\s</span><span class="content">*$</span><span class="delimiter">/</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">\1</span><span class="delimiter">'</span></span>)
+      time = <span class="constant">DateTime</span>.parse(time.at(<span class="string"><span class="delimiter">'</span><span class="content">abbr</span><span class="delimiter">'</span></span>)[<span class="string"><span class="delimiter">'</span><span class="content">title</span><span class="delimiter">'</span></span>])
+
+      [tweet, time]
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+
+  <span class="keyword">def</span> <span class="function">older?</span>
+    (<span class="instance-variable">@doc</span>/<span class="string"><span class="delimiter">'</span><span class="content">div.tab</span><span class="delimiter">'</span></span>/<span class="string"><span class="delimiter">'</span><span class="content">div.pagination</span><span class="delimiter">'</span></span>/<span class="string"><span class="delimiter">'</span><span class="content">a</span><span class="delimiter">'</span></span>).last.inner_text =~ <span class="regexp"><span class="delimiter">/</span><span class="content">Older</span><span class="delimiter">/</span></span>
+  <span class="keyword">end</span>
+
+  <span class="keyword">def</span> <span class="function">succ</span>
+    <span class="keyword">if</span> <span class="instance-variable">@tweets</span>.empty?
+      <span class="keyword">return</span> <span class="predefined-constant">nil</span> <span class="keyword">unless</span> older?
+
+      <span class="instance-variable">@page</span> += <span class="integer">1</span>
+      <span class="instance-variable">@doc</span> = Hpricot(open(<span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span><span class="instance-variable">@user_url</span><span class="inline-delimiter">}</span></span><span class="content">?page=</span><span class="inline"><span class="inline-delimiter">#{</span><span class="instance-variable">@page</span><span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span>))
+      <span class="instance-variable">@tweets</span> = page_to_tweets
+    <span class="keyword">end</span>
+
+    <span class="instance-variable">@tweets</span>.shift
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>Next, a quick script to download the tweets into a CSV file. This is actually a bit over-engineered, as it’ll only download tweets that have not been previously downloaded. Note that this takes the username as a command line argument.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+<a href="#n19" name="n19">19</a>
+<strong><a href="#n20" name="n20">20</a></strong>
+<a href="#n21" name="n21">21</a>
+<a href="#n22" name="n22">22</a>
+<a href="#n23" name="n23">23</a>
+<a href="#n24" name="n24">24</a>
+<a href="#n25" name="n25">25</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">fastercsv</span><span class="delimiter">'</span></span>
+require <span class="string"><span class="delimiter">'</span><span class="content">tweet</span><span class="delimiter">'</span></span>
+
+base_path = <span class="constant">File</span>.dirname(<span class="predefined-constant">__FILE__</span>)
+
+csv_files = <span class="constant">Dir</span>[<span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>base_path<span class="inline-delimiter">}</span></span><span class="content">/*.csv</span><span class="delimiter">&quot;</span></span>].sort_by <span class="keyword">do</span> |filename|
+  <span class="constant">DateTime</span>.parse(<span class="constant">File</span>.basename(filename, <span class="string"><span class="delimiter">'</span><span class="content">.csv</span><span class="delimiter">'</span></span>))
+<span class="keyword">end</span>
+
+last_update = <span class="constant">DateTime</span>.parse(<span class="constant">File</span>.basename(csv_files.last, <span class="string"><span class="delimiter">'</span><span class="content">.csv</span><span class="delimiter">'</span></span>)) <span class="keyword">unless</span> csv_files.empty?
+
+tweets = <span class="constant">Tweet</span>.new(<span class="predefined-constant">ARGV</span>.shift)
+current_update_time = tweets.current_tweet.last
+
+<span class="keyword">if</span> last_update.nil? <span class="keyword">or</span> current_update_time &gt; last_update
+  <span class="constant">FasterCSV</span>.open(<span class="constant">File</span>.join(base_path, <span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>current_update_time.to_s<span class="inline-delimiter">}</span></span><span class="content">.csv</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">'</span><span class="content">w</span><span class="delimiter">'</span></span>) <span class="keyword">do</span> |csv|
+    <span class="keyword">while</span> t = tweets.succ
+      tweet,time = t
+
+      <span class="keyword">break</span> <span class="keyword">if</span> last_update <span class="keyword">and</span> time &lt;= last_update
+
+      csv &lt;&lt; [tweet, time.to_s]
+    <span class="keyword">end</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre></td>
+</tr></table>
+</div>
+
+<p>And last, creating the graphs of the statistics from the CSV files.</p>
+
+<div class="language-ruby highlighter-coderay"><table class="CodeRay"><tr>
+  <td class="line-numbers"><pre><a href="#n1" name="n1">1</a>
+<a href="#n2" name="n2">2</a>
+<a href="#n3" name="n3">3</a>
+<a href="#n4" name="n4">4</a>
+<a href="#n5" name="n5">5</a>
+<a href="#n6" name="n6">6</a>
+<a href="#n7" name="n7">7</a>
+<a href="#n8" name="n8">8</a>
+<a href="#n9" name="n9">9</a>
+<strong><a href="#n10" name="n10">10</a></strong>
+<a href="#n11" name="n11">11</a>
+<a href="#n12" name="n12">12</a>
+<a href="#n13" name="n13">13</a>
+<a href="#n14" name="n14">14</a>
+<a href="#n15" name="n15">15</a>
+<a href="#n16" name="n16">16</a>
+<a href="#n17" name="n17">17</a>
+<a href="#n18" name="n18">18</a>
+<a href="#n19" name="n19">19</a>
+<strong><a href="#n20" name="n20">20</a></strong>
+<a href="#n21" name="n21">21</a>
+<a href="#n22" name="n22">22</a>
+<a href="#n23" name="n23">23</a>
+<a href="#n24" name="n24">24</a>
+<a href="#n25" name="n25">25</a>
+<a href="#n26" name="n26">26</a>
+<a href="#n27" name="n27">27</a>
+<a href="#n28" name="n28">28</a>
+<a href="#n29" name="n29">29</a>
+<strong><a href="#n30" name="n30">30</a></strong>
+<a href="#n31" name="n31">31</a>
+<a href="#n32" name="n32">32</a>
+<a href="#n33" name="n33">33</a>
+<a href="#n34" name="n34">34</a>
+<a href="#n35" name="n35">35</a>
+<a href="#n36" name="n36">36</a>
+<a href="#n37" name="n37">37</a>
+<a href="#n38" name="n38">38</a>
+</pre></td>
+  <td class="code"><pre>require <span class="string"><span class="delimiter">'</span><span class="content">fastercsv</span><span class="delimiter">'</span></span>
+require <span class="string"><span class="delimiter">'</span><span class="content">gchart</span><span class="delimiter">'</span></span>
+require <span class="string"><span class="delimiter">'</span><span class="content">tweet</span><span class="delimiter">'</span></span>
+
+base_path = <span class="constant">File</span>.dirname(<span class="predefined-constant">__FILE__</span>)
+year = <span class="integer">2007</span>
+
+month_data = <span class="constant">Array</span>.new(<span class="integer">12</span>, <span class="integer">0</span>)
+hour_data = <span class="constant">Array</span>.new(<span class="integer">24</span>, <span class="integer">0</span>)
+reply_data = <span class="constant">Hash</span>.new(<span class="integer">0</span>)
+
+<span class="constant">Dir</span>[<span class="string"><span class="delimiter">&quot;</span><span class="inline"><span class="inline-delimiter">#{</span>base_path<span class="inline-delimiter">}</span></span><span class="content">/*.csv</span><span class="delimiter">&quot;</span></span>].each <span class="keyword">do</span> |filename|
+  <span class="constant">FasterCSV</span>.foreach(filename) <span class="keyword">do</span> |row|
+    tweet = row.first
+    time = <span class="constant">DateTime</span>.parse(row.last)
+
+    month_data[time.month - <span class="integer">1</span>] += <span class="integer">1</span> <span class="keyword">if</span> time.year == year
+    hour_data[(time.hour-<span class="integer">8</span>)%<span class="integer">24</span>] += <span class="integer">1</span> <span class="keyword">if</span> time.year == year
+    reply_data[<span class="global-variable">$1</span>] += <span class="integer">1</span> <span class="keyword">if</span> tweet =~ <span class="regexp"><span class="delimiter">/</span><span class="content">@&lt;a href=&quot;</span><span class="char">\/</span><span class="content">([^&quot;]+)&quot;&gt;</span><span class="char">\1</span><span class="content">&lt;</span><span class="char">\/</span><span class="content">a&gt;</span><span class="delimiter">/</span></span> <span class="keyword">and</span> time.year == year
+  <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+puts <span class="constant">GChart</span>.line(
+  <span class="symbol">:title</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">Tweets per Hour</span><span class="delimiter">'</span></span>,
+  <span class="symbol">:data</span> =&gt; hour_data,
+  <span class="symbol">:width</span> =&gt; <span class="integer">400</span>,
+  <span class="symbol">:height</span> =&gt; <span class="integer">300</span>,
+  <span class="symbol">:extras</span> =&gt; { <span class="string"><span class="delimiter">'</span><span class="content">chxt</span><span class="delimiter">'</span></span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">x,y</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">chxl</span><span class="delimiter">'</span></span> =&gt; <span class="string"><span class="delimiter">&quot;</span><span class="content">0:|</span><span class="inline"><span class="inline-delimiter">#{</span>(<span class="integer">0</span>..<span class="integer">23</span>).to_a.join(<span class="string"><span class="delimiter">'</span><span class="content">|</span><span class="delimiter">'</span></span>)<span class="inline-delimiter">}</span></span><span class="content">|1:|</span><span class="inline"><span class="inline-delimiter">#{</span>hour_data.min<span class="inline-delimiter">}</span></span><span class="content">|</span><span class="inline"><span class="inline-delimiter">#{</span>hour_data.max<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span> }
+).to_url
+
+puts <span class="constant">GChart</span>.bar(
+  <span class="symbol">:title</span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">Tweets per Month</span><span class="delimiter">'</span></span>,
+  <span class="symbol">:data</span> =&gt; month_data,
+  <span class="symbol">:width</span> =&gt; <span class="integer">400</span>,
+  <span class="symbol">:height</span> =&gt; <span class="integer">300</span>,
+  <span class="symbol">:extras</span> =&gt; { <span class="string"><span class="delimiter">'</span><span class="content">chxt</span><span class="delimiter">'</span></span> =&gt; <span class="string"><span class="delimiter">'</span><span class="content">x,y</span><span class="delimiter">'</span></span>, <span class="string"><span class="delimiter">'</span><span class="content">chxl</span><span class="delimiter">'</span></span> =&gt; <span class="string"><span class="delimiter">&quot;</span><span class="content">0:|</span><span class="inline"><span class="inline-delimiter">#{</span><span class="constant">Date</span>::<span class="constant">ABBR_MONTHNAMES</span>.compact.join(<span class="string"><span class="delimiter">'</span><span class="content">|</span><span class="delimiter">'</span></span>)<span class="inline-delimiter">}</span></span><span class="content">|1:|</span><span class="inline"><span class="inline-delimiter">#{</span>month_data.min<span class="inline-delimiter">}</span></span><span class="content">|</span><span class="inline"><span class="inline-delimiter">#{</span>month_data.max<span class="inline-delimiter">}</span></span><span class="delimiter">&quot;</span></span> },
+      <span class="symbol">:orientation</span> =&gt; <span class="symbol">:vertical</span>
+    ).to_url
+</pre></td>
+</tr></table>
+</div>
+
+<h2 id="output">Output</h2>
+
+<p><a href="http://chart.apis.google.com/chart?chxt=x,y&amp;chxl=0:%7C0%7C1%7C2%7C3%7C4%7C5%7C6%7C7%7C8%7C9%7C10%7C11%7C12%7C13%7C14%7C15%7C16%7C17%7C18%7C19%7C20%7C21%7C22%7C23%7C1:%7C1%7C40&amp;chs=400x300&amp;cht=lc&amp;chtt=Tweets+per+Hour&amp;chd=e:LNDNGaDNBmDNRmpm-Z..7MgAgAkzzMuZeZ">tweets/hour</a>:
+{% include img name=&rdquo;tweets-per-hour.png&rdquo; alt=&rdquo;Tweets per hour&rdquo; %}</p>
+
+<p><a href="http://chart.apis.google.com/chart?chxt=x,y&amp;chxl=0:%7CJan%7CFeb%7CMar%7CApr%7CMay%7CJun%7CJul%7CAug%7CSep%7COct%7CNov%7CDec%7C1:%7C0%7C148&amp;chs=400x300&amp;cht=bvs&amp;chtt=Tweets+per+Month&amp;chd=e:AcAAA3AAAAAAAAAAopyl4N..">tweets/month</a>:
+{% include img name=&rdquo;tweets-per-month.png&rdquo; alt=&rdquo;Tweets per month&rdquo; %}</p>
+
+      </article>
+    </main>
+  </body>
+</html>
