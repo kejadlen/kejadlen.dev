@@ -25,6 +25,30 @@ site.each do |output, input|
   CLEAN.include(output)
 end
 
+desc "Serve"
+task :serve do
+  require "rerun"
+  require "webrick"
+
+  Thread.new do
+    server = WEBrick::HTTPServer.new(Port: 8000, DocumentRoot: config.out)
+    trap "INT" do
+      server.shutdown
+    end
+    server.start
+  end
+
+  options = Rerun::Options.parse(args: %w[ rake --exit ])
+  cmd = options.delete(:cmd)
+  runner = Thread.new do
+    Rerun::Runner.keep_running(cmd, options)
+  end
+
+  system "open http://localhost:8000"
+
+  runner.join
+end
+
 desc "Push"
 task :push do
   sh "git subtree push --prefix=#{config.out} gh-pages"
