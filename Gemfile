@@ -6,5 +6,6 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
 gem "kramdown"
 gem "kramdown-parser-gfm"
+gem "pry"
 gem "rake"
 gem "rerun"
