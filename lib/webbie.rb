@@ -24,7 +24,7 @@ module Webbie
     end
 
     def deps
-      [out, *pages.map(&:out)]
+      FileList[out, *pages.map(&:out)]
     end
   end
 
@@ -52,7 +52,7 @@ module Webbie
     end
 
     def deps
-      [@path, *@layouts.map(&:path)]
+      FileList[@path, *@layouts.map(&:path)]
     end
 
     def render

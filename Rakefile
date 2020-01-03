@@ -15,10 +15,11 @@ site = Site.new(
   },
 )
 
-directory site.out
-
 site.pages.each do |page|
-  task page.out => page.deps do
+  dir = File.dirname(page.out)
+  directory dir
+
+  task page.out => FileList[*page.deps, dir] do
     File.write(page.out, page.render)
   end
 end
@@ -26,6 +27,7 @@ end
 task :prune do
   FileList["#{site.out}/**/*", "#{site.out}/**/.*"]
     .exclude(site.deps)
+    .select {|f| File.file?(f) } # TODO delete empty directories
     .each do |f|
       rm f
   end
