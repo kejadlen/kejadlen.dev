@@ -39,7 +39,7 @@ module Webbie
       end
       @segments, @exts = segments, exts
 
-      @layouts = %w[ default ]
+      @layouts = %w[ default ].map {|l| @site.layouts.fetch(l) }
     end
 
     def out
@@ -47,16 +47,14 @@ module Webbie
     end
 
     def deps
-      [@path]
+      [@path, *@layouts.map(&:path)]
     end
 
     def render
       renderers = @exts.map {|ext| @site.renderers.fetch(ext) }
       content = renderers.inject(File.read(@path)) {|c,r| r.(c) }
 
-      @layouts
-        .map {|l| @site.layouts.fetch(l) }
-        .inject(content) {|c,l| l.render(c) }
+      @layouts.inject(content) {|c,l| l.render(c) }
     end
   end
 
