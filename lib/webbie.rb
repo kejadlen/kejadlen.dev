@@ -19,12 +19,13 @@ module Webbie
 
       @pages = FileList["#{src}/**/*", "#{src}/**/.*"]
         .exclude(@layouts.values.map(&:path))
+        .exclude("**/_config.yml")
         .select {|f| File.file?(f) }
         .map {|p| Page.new(self, p) }
     end
 
     def deps
-      FileList[out, *pages.map(&:out)]
+      [out, *pages.map(&:out)]
     end
   end
 
@@ -33,8 +34,8 @@ module Webbie
       @site, @path = site, path
 
       ss = StringScanner.new(File.read(path))
-      ss.scan(/---$(?<config>(?~---))^---$/)
-      @config = ss[:config] ? YAML.load(ss[:config]) : {}
+      ss.scan(/^---$(?<frontmatter>(?~---))^---$/)
+      @frontmatter = ss[:frontmatter] ? YAML.load(ss[:frontmatter]) : {}
       @content = ss.rest.strip
 
       segments = @path.split(?.)
@@ -43,8 +44,6 @@ module Webbie
         exts << segments.pop
       end
       @segments, @exts = segments, exts
-
-      @layouts = Array(@config["layout"]).map {|l| @site.layouts.fetch(l) }
     end
 
     def out
@@ -52,14 +51,29 @@ module Webbie
     end
 
     def deps
-      FileList[@path, *@layouts.map(&:path)]
+      [@path, *layout.deps]
     end
 
     def render
       renderers = @exts.map {|ext| @site.renderers.fetch(ext) }
       content = renderers.inject(@content) {|c,r| r.(c) }
 
-      @layouts.inject(content) {|c,l| l.render(c) }
+      layout.render(content)
+    end
+
+    private
+
+    def config
+      config = Pathname.new(@path).descend
+        .map {|p| "#{p}/_config.yml" }
+        .select {|p| File.file?(p) }
+        .map {|p| YAML.load_file(p) }
+        .inject({}, &:merge)
+      config.merge(@frontmatter)
+    end
+
+    def layout
+      @site.layouts.fetch(config.fetch("layout") { "default" }) { Layout::Noop }
     end
   end
 
@@ -68,6 +82,7 @@ module Webbie
 
     def initialize(path)
       @path = path
+      @template = ERB.new(File.read(@path))
     end
 
     def name
@@ -75,7 +90,21 @@ module Webbie
     end
 
     def render(content)
-      ERB.new(File.read(path)).result_with_hash(content: content)
+      @template.result_with_hash(content: content)
+    end
+
+    def deps
+      [path]
+    end
+
+    module Noop
+      def self.deps
+        []
+      end
+
+      def self.render(content)
+        content
+      end
     end
   end
 end
