@@ -19,7 +19,7 @@ site.pages.each do |page|
   dir = File.dirname(page.out)
   directory dir
 
-  task page.out => FileList[*page.deps, dir] do
+  task page.out => FileList[*page.deps, dir, "Gemfile.lock", "Rakefile", "lib/**/*.rb"] do
     File.write(page.out, page.render)
   end
 end
