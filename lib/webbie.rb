@@ -22,12 +22,6 @@ module Webbie
         .reject {|f| File.directory?(f) }
         .map {|p| Page.new(self, p) }
     end
-
-    def make_tasks!(root="site")
-      directory @out
-      CLEAN.include(@out)
-      task root => @out
-    end
   end
 
   class Page
