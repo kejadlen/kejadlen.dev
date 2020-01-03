@@ -44,26 +44,22 @@ task default: FileList[
 
 desc "Serve"
 task :serve do
-  require "rerun"
-  require "webrick"
+  require "rack"
 
-  Thread.new do
-    server = WEBrick::HTTPServer.new(Port: 8000, DocumentRoot: site.out)
-    trap "INT" do
-      server.shutdown
-    end
-    server.start
-  end
+  static = Rack::Static.new(nil, urls: [""], root: site.out, index: "index.html")
+  app = ->(env) {
+    req = Rack::Request.new(env)
+    file = File.join(site.out, req.path)
+    file << ".index.html" if File.directory?(file)
+    Rake::Task[file].invoke if Rake::Task.task_defined?(file)
 
-  options = Rerun::Options.parse(args: %w[ --pattern {Gemfile,Gemfile.lock,Rakefile,lib/**/*,src/**/*} --exit rake ])
-  cmd = options.delete(:cmd)
-  runner = Thread.new do
-    Rerun::Runner.keep_running(cmd, options)
-  end
+    static.call(env)
+  }
 
-  system "open http://localhost:8000"
-
-  runner.join
+  Rack::Server.start(
+    app: app,
+    Port: 8000,
+  )
 end
 
 desc "Push"
