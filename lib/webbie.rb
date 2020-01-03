@@ -1,4 +1,6 @@
 require "erb"
+require "strscan"
+require "yaml"
 
 require "rake/file_list"
 
@@ -32,6 +34,11 @@ module Webbie
     def initialize(site, path)
       @site, @path = site, path
 
+      ss = StringScanner.new(File.read(path))
+      ss.scan(/---$(?<config>(?~---))^---$/)
+      @config = ss[:config] ? YAML.load(ss[:config]) : {}
+      @content = ss.rest.strip
+
       segments = @path.split(?.)
       exts = []
       while @site.renderers.keys.include?(segments.last)
@@ -39,7 +46,7 @@ module Webbie
       end
       @segments, @exts = segments, exts
 
-      @layouts = %w[ default ].map {|l| @site.layouts.fetch(l) }
+      @layouts = Array(@config["layout"]).map {|l| @site.layouts.fetch(l) }
     end
 
     def out
@@ -52,7 +59,7 @@ module Webbie
 
     def render
       renderers = @exts.map {|ext| @site.renderers.fetch(ext) }
-      content = renderers.inject(File.read(@path)) {|c,r| r.(c) }
+      content = renderers.inject(@content) {|c,r| r.(c) }
 
       @layouts.inject(content) {|c,l| l.render(c) }
     end
