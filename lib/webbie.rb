@@ -22,6 +22,10 @@ module Webbie
         .exclude("**/_config.yml")
         .select {|f| File.file?(f) }
         .map {|p| Page.new(self, p) }
+
+      # This needs to be done after figuring out pages, since we exclude
+      # layouts from pages.
+      @layouts["default"] ||= Layout::Noop
     end
 
     def deps
@@ -73,7 +77,7 @@ module Webbie
     end
 
     def layout
-      @site.layouts.fetch(config.fetch("layout") { "default" }) { Layout::Noop }
+      @site.layouts.fetch(config.fetch("layout") { "default" })
     end
   end
 
