@@ -19,8 +19,12 @@ module Webbie
 
       @pages = FileList["#{src}/**/*", "#{src}/**/.*"]
         .exclude(@layouts.values.map(&:path))
-        .reject {|f| File.directory?(f) }
+        .select {|f| File.file?(f) }
         .map {|p| Page.new(self, p) }
+    end
+
+    def deps
+      [out, *pages.map(&:out)]
     end
   end
 

@@ -1,3 +1,5 @@
+include FileUtils::Verbose
+
 $LOAD_PATH.unshift(File.expand_path("lib", __dir__))
 require "webbie"
 
@@ -21,9 +23,17 @@ site.pages.each do |page|
   end
 end
 
+task :prune do
+  FileList["#{site.out}/**/*", "#{site.out}/**/.*"]
+    .exclude(site.deps)
+    .each do |f|
+      rm f
+  end
+end
+
 task default: FileList[
-  site.out,
-  *site.pages.map(&:out),
+  *site.deps,
+  :prune,
 ]
 
 #
