@@ -50,8 +50,10 @@ task :serve do
   app = ->(env) {
     req = Rack::Request.new(env)
     file = File.join(site.out, req.path)
-    file << ".index.html" if File.directory?(file)
-    Rake::Task[file].invoke if Rake::Task.task_defined?(file)
+    file << "index.html" if File.directory?(file)
+
+    # Shell out here since we want to use modified code if we've changed it
+    sh "rake #{file}" if Rake::Task.task_defined?(file)
 
     static.call(env)
   }
