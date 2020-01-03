@@ -12,7 +12,7 @@ module Webbie
       @src, @out = src, out
 
       @layouts = FileList["#{src}/#{layouts}/*.erb"]
-        .map {|l| Layout.new(l) }
+        .map {|l| Layout.new(self, l) }
         .to_h {|l| [l.name, l] }
 
       @renderers = renderers.transform_keys(&:to_s)
@@ -84,9 +84,14 @@ module Webbie
   class Layout
     attr_reader *%i[ name path ]
 
-    def initialize(path)
-      @path = path
-      @template = ERB.new(File.read(@path))
+    def initialize(site, path)
+      @site, @path = site, path
+
+      ss = StringScanner.new(File.read(path))
+      ss.scan(/^---$(?<frontmatter>(?~---))^---$/)
+      @frontmatter = ss[:frontmatter] ? YAML.load(ss[:frontmatter]) : {}
+
+      @template = ERB.new(ss.rest.strip)
     end
 
     def name
@@ -94,11 +99,19 @@ module Webbie
     end
 
     def render(content)
-      @template.result_with_hash(content: content)
+      content = @template.result_with_hash(content: content)
+
+      layout.render(content)
     end
 
     def deps
       [path]
+    end
+
+    private
+
+    def layout
+      @site.layouts.fetch(@frontmatter.fetch("layout") { "default" })
     end
 
     module Noop
